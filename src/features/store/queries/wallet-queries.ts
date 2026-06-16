@@ -1,5 +1,6 @@
 import { apiClient } from "@/shared/api/api-client"
 import type { Result, PagedResult } from "@/types/api"
+import { toast } from "sonner"
 
 export interface WalletResponse {
   id: string
@@ -72,7 +73,7 @@ export const walletQueryKeys = {
 
 export async function fetchMyWallet(): Promise<WalletResponse | null> {
   const maxRetries = 5
-  const delayMs = 1000
+  const delayMs = 2000
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -84,10 +85,14 @@ export async function fetchMyWallet(): Promise<WalletResponse | null> {
     } catch (error) {
       const err = error as { response?: { status?: number } }
       const status = err.response?.status
-      if (status === 404 && attempt < maxRetries) {
-        console.log(`[fetchMyWallet] Wallet not found (404). Retrying in ${delayMs}ms... (Attempt ${attempt}/${maxRetries})`)
-        await new Promise((resolve) => setTimeout(resolve, delayMs))
-        continue
+      if (status === 404) {
+        if (attempt < maxRetries) {
+          console.log(`[fetchMyWallet] Wallet not found (404). Retrying in ${delayMs}ms... (Attempt ${attempt}/${maxRetries})`)
+          await new Promise((resolve) => setTimeout(resolve, delayMs))
+          continue
+        } else {
+          toast.error("Lỗi hệ thống: Không thể khởi tạo ví của bạn. Vui lòng tải lại trang hoặc liên hệ hỗ trợ.")
+        }
       }
       console.error("Loi khi lay thong tin vi:", error)
       return null

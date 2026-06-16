@@ -949,7 +949,7 @@ export function AccountScreen() {
                     <div className="relative z-10">
                       <p className="text-sm opacity-80">Số dư khả dụng</p>
                       <p className="mt-2 text-3xl font-bold">
-                        {wallet ? `${wallet.balance.toLocaleString("vi-VN")} đ` : "0 đ"}
+                        {wallet ? `${wallet.balance.toLocaleString("vi-VN")} đ` : "--"}
                       </p>
                     </div>
                     <Wallet className="absolute -bottom-6 -right-6 h-28 w-28 opacity-10 rotate-12 pointer-events-none" />

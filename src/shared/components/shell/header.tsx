@@ -297,7 +297,7 @@ export function Header() {
                         <span className="flex items-center justify-between w-full gap-2">
                           <span>Ví</span>
                           <span className="text-[10px] font-bold bg-[rgb(var(--store-accent-rgb)/0.1)] px-1.5 py-0.5 rounded store-accent-text shrink-0">
-                            {wallet ? `${wallet.balance.toLocaleString("vi-VN")} đ` : "0 đ"}
+                            {wallet ? `${wallet.balance.toLocaleString("vi-VN")} đ` : "--"}
                           </span>
                         </span>
                       </Link>
