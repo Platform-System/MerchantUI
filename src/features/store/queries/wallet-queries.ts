@@ -71,16 +71,29 @@ export const walletQueryKeys = {
 }
 
 export async function fetchMyWallet(): Promise<WalletResponse | null> {
-  try {
-    const response = await apiClient.get<Result<WalletResponse>>("/api/wallet/me")
-    if (response.data?.success && response.data.data) {
-      return response.data.data
+  const maxRetries = 5
+  const delayMs = 1000
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await apiClient.get<Result<WalletResponse>>("/api/wallet/me")
+      if (response.data?.success && response.data.data) {
+        return response.data.data
+      }
+      return null
+    } catch (error) {
+      const err = error as { response?: { status?: number } }
+      const status = err.response?.status
+      if (status === 404 && attempt < maxRetries) {
+        console.log(`[fetchMyWallet] Wallet not found (404). Retrying in ${delayMs}ms... (Attempt ${attempt}/${maxRetries})`)
+        await new Promise((resolve) => setTimeout(resolve, delayMs))
+        continue
+      }
+      console.error("Loi khi lay thong tin vi:", error)
+      return null
     }
-    return null
-  } catch (error) {
-    console.error("Loi khi lay thong tin vi:", error)
-    return null
   }
+  return null
 }
 
 export async function fetchMyWalletTransactions(

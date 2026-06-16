@@ -17,6 +17,10 @@ configurePlatformApi({
     const status = error.response?.status;
     const message = error.response?.data?.message || error.message;
 
+    if (status === 404 && error.config?.url?.includes('/api/wallet/me')) {
+      return;
+    }
+
     if (status === 403) {
       toast.error('Bạn không có quyền thực hiện hành động này.');
     } else if (status >= 500) {
