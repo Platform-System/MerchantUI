@@ -1,12 +1,14 @@
 import React from "react"
 import { useQuery } from "@tanstack/react-query"
 import type { AxiosError } from "axios"
+import { useSearchParams } from "next/navigation"
 import { StoreOrder, StoreProfile } from "@/types/store"
 import { DEFAULT_PROFILE } from "../constants"
 import { useWishlist } from "@/features/wishlist"
 import { useCart } from "@/features/cart"
 import { apiClient } from "@/shared/api/api-client"
 import { Result } from "@/types/api"
+import { fetchMyWallet, fetchMyWalletTransactions, fetchMyWalletStatement, walletQueryKeys } from "@/features/store/queries/wallet-queries"
 
 interface AccountProfileResponse {
   userName?: string | null
@@ -51,10 +53,20 @@ interface OrdersListResponse {
 }
 
 export function useAccount() {
-  const [activeTab, setActiveTab] = React.useState("profile")
+  const searchParams = useSearchParams()
+  const initialTab = searchParams.get("tab") || "orders"
+  const [activeTab, setActiveTab] = React.useState(initialTab)
   const [profile, setProfile] = React.useState<StoreProfile>(DEFAULT_PROFILE)
 
-  const { data: profileData } = useQuery({
+  React.useEffect(() => {
+    const tab = searchParams.get("tab")
+    if (tab) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActiveTab(tab)
+    }
+  }, [searchParams])
+
+  const { data: profileData, refetch: refetchProfile } = useQuery({
     queryKey: ["profile"],
     queryFn: async (): Promise<AccountProfileResponse | null> => {
       try {
@@ -65,6 +77,15 @@ export function useAccount() {
       } catch (error) {
         const apiError = error as AxiosError
         if (apiError.response?.status === 404) {
+          try {
+            // Tự động gọi API sync để đồng bộ tài khoản mới từ Keycloak và khởi tạo ví
+            const syncResponse = await apiClient.post<Result<AccountProfileResponse>>("/api/identity/users/sync")
+            if (syncResponse.data && syncResponse.data.success && syncResponse.data.data) {
+              return syncResponse.data.data
+            }
+          } catch (syncError) {
+            console.error("Loi khi sync session nguoi dung:", syncError)
+          }
           return null
         }
         throw apiError
@@ -88,6 +109,44 @@ export function useAccount() {
     retry: false,
   })
 
+  const { data: wallet, refetch: refetchWallet } = useQuery({
+    queryKey: walletQueryKeys.me,
+    queryFn: fetchMyWallet,
+    staleTime: 30 * 1000,
+    retry: false,
+  })
+
+  const { data: walletTransactionsData, refetch: refetchTransactions } = useQuery({
+    queryKey: walletQueryKeys.transactions,
+    queryFn: () => fetchMyWalletTransactions(1, 100),
+    staleTime: 30 * 1000,
+    retry: false,
+  })
+
+  const walletTransactions = walletTransactionsData?.items || []
+
+  const [statementFrom, setStatementFrom] = React.useState(() => {
+    const d = new Date()
+    d.setDate(d.getDate() - 30)
+    return d.toISOString().split("T")[0]
+  })
+  const [statementTo, setStatementTo] = React.useState(() => {
+    return new Date().toISOString().split("T")[0]
+  })
+
+  const { data: walletStatement, refetch: refetchStatement, isFetching: isFetchingStatement } = useQuery({
+    queryKey: walletQueryKeys.statement({
+      createdAtFrom: statementFrom ? `${statementFrom}T00:00:00Z` : undefined,
+      createdAtTo: statementTo ? `${statementTo}T23:59:59Z` : undefined,
+    }),
+    queryFn: () => fetchMyWalletStatement({
+      createdAtFrom: statementFrom ? `${statementFrom}T00:00:00Z` : undefined,
+      createdAtTo: statementTo ? `${statementTo}T23:59:59Z` : undefined,
+    }),
+    staleTime: 30 * 1000,
+    retry: false,
+  })
+
   React.useEffect(() => {
     if (profileData) {
       const nextProfile: StoreProfile = {
@@ -99,6 +158,10 @@ export function useAccount() {
 
       const timer = window.setTimeout(() => {
         setProfile(nextProfile)
+        // Refetch thông tin ví khi profile đã được đồng bộ / tải thành công
+        refetchWallet()
+        refetchTransactions()
+        refetchStatement()
       }, 0)
 
       return () => window.clearTimeout(timer)
@@ -195,5 +258,16 @@ export function useAccount() {
     updateProfileField,
     translateOrderStatus,
     statusClassName,
+    wallet,
+    walletTransactions,
+    refetchWallet,
+    refetchTransactions,
+    statementFrom,
+    setStatementFrom,
+    statementTo,
+    setStatementTo,
+    walletStatement,
+    refetchStatement,
+    isFetchingStatement,
   }
 }

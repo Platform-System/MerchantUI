@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Geist_Mono, Playfair_Display } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { ThemeProvider } from "@platform-system/design-ui/theme-provider";
 import { BRAND_METADATA } from "@platform-system/design-ui/branding";
 import QueryProvider from "@/core/providers/QueryProvider";
@@ -12,18 +12,6 @@ const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700", "800"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin", "vietnamese"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  style: ["italic", "normal"],
 });
 
 export const metadata: Metadata = {
@@ -39,7 +27,7 @@ export default async function RootLayout({
   return (
     <html lang="vi" suppressHydrationWarning>
       <body
-        className={`${plusJakarta.variable} ${geistMono.variable} ${playfair.variable} relative h-screen overflow-hidden bg-background text-foreground antialiased transition-colors duration-300`}
+        className={`${plusJakarta.variable} relative h-screen overflow-hidden bg-background text-foreground antialiased transition-colors duration-300`}
       >
         <ThemeProvider defaultTheme="light">
           <Toaster richColors closeButton position="top-right" />

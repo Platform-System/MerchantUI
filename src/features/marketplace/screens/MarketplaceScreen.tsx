@@ -327,7 +327,7 @@ function MarketplaceScreenContent() {
                 <EmptyStatePanel
                   icon={<Search className="h-8 w-8" />}
                   title="Không có sản phẩm nào"
-                  description=""
+                  description="Hiện tại chưa có sản phẩm nào. Hãy quay lại sau nhé!"
                   primaryActionNode={
                     <Button
                       variant="outline"

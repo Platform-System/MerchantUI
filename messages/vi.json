@@ -1,16 +1,12 @@
 {
   "Home": {
     "eyebrow": "CHÀO MỪNG ĐẾN NYX'S RADIANCE",
-    "headline": "Tất cả vì bạn",
     "description": "Giải trí, kết nối, mua sắm và khám phá — tất cả trong cùng một không gian.",
-    "scrollDiscover": "CUỘN ĐỂ KHÁM PHÁ",
     "social": {
       "eyebrow": "NỀN TẢNG XÃ HỘI",
       "title": "Kết Nối Thế Giới Của Bạn",
       "description": "Chia sẻ khoảnh khắc, gặp gỡ mọi người và xây dựng cộng đồng quanh những điều bạn yêu thích.",
-      "cta": "Khám phá Social",
-      "profileBio": "Rất vui được gặp bạn! Hãy cùng nhau tạo nên những điều tuyệt vời.",
-      "profileShard": "Thật vui vì chúng ta đã tìm thấy nhau trong thế giới này! ✨"
+      "cta": "Khám phá Social"
     },
     "store": {
       "eyebrow": "CỬA HÀNG",
@@ -48,7 +44,6 @@
       "title": "Khách hàng nói gì về {brand}",
       "stats": {
         "rating": "Đánh giá trung bình",
-        "satisfaction": "Mức độ hài lòng",
         "support": "Hỗ trợ khách hàng",
         "securePayment": "Thanh toán an toàn"
       },
@@ -92,7 +87,6 @@
     "sellerNotFoundDesc": "Gian hàng này không còn tồn tại hoặc đường dẫn bạn mở không chính xác.",
     "viewAllSellers": "Xem danh sách nhà bán hàng",
     "backToStore": "Quay lại cửa hàng",
-    "bought": "Đã mua",
     "reviewsSummaryPending": "Phần thống kê chi tiết và danh sách đánh giá sẽ được hiển thị ngay khi backend mở dữ liệu review cho storefront.",
     "reviewsUnavailable": "Hiện storefront mới lấy được điểm tổng quan và số lượng đánh giá. Nội dung review chi tiết sẽ được bổ sung khi API tương ứng sẵn sàng.",
     "noReviewsYet": "Chưa có đánh giá để hiển thị",
@@ -258,40 +252,31 @@
     "confirmOrder": "Xác nhận đặt hàng",
     "processing": "Đang xử lý...",
     "orderSuccess": "Đặt hàng thành công",
-    "orderSuccessDesc": "Cảm ơn bạn đã tin tưởng Nyxoris. Đơn hàng của bạn đang được xử lý.",
     "orderPlacedTitle": "Tuyệt vời! Đơn hàng đã được đặt",
     "orderPlacedDesc": "Hệ thống đã ghi nhận đơn hàng của bạn. Một email xác nhận sẽ được gửi đến hộp thư trong giây lát.",
-    "incompleteInfo": "Thông tin chưa đầy đủ",
-    "invalidEmail": "Email chưa đúng định dạng.",
     "requiredField": "Vui lòng nhập {field}."
   },
   "Account": {
     "title": "Tài khoản của tôi",
-    "tabProfile": "Hồ sơ",
     "tabOrders": "Đơn hàng",
-    "tabWishlist": "Mục đã lưu",
     "tabStore": "Gian hàng",
+    "tabWallet": "Ví",
     "logout": "Đăng xuất",
-    "personalInfo": "Thông tin cá nhân",
-    "editProfile": "Chỉnh sửa hồ sơ",
-    "done": "Xong",
-    "joinedSince": "Tham gia từ",
     "fullName": "Họ và tên",
     "email": "Địa chỉ email",
     "orderHistory": "Lịch sử mua hàng",
+    "orderHistoryDesc": "Xem và theo dõi trạng thái các đơn hàng bạn đã đặt mua.",
     "noOrders": "Chưa có đơn hàng nào",
-    "noOrdersDesc": "Khi bạn hoàn tất checkout, đơn hàng sẽ xuất hiện ở đây để FE có thể nối tiếp sang order history từ backend.",
-    "wishlistEmpty": "Danh sách yêu thích đang trống",
-    "wishlistEmptyDesc": "Những sản phẩm bạn lưu ở marketplace hoặc product detail sẽ hiện ở đây ngay.",
+    "noOrdersDesc": "Đơn hàng của bạn sẽ hiển thị tại đây.",
     "statusPending": "Chờ xác nhận",
     "statusProcessing": "Đang xử lý",
     "statusShipped": "Đang giao",
     "statusDelivered": "Đã giao",
     "store": {
-      "title": "Gian hàng của tôi",
+      "title": "Gian hàng",
       "description": "Quản lý hồ sơ gian hàng, chính sách bán hàng và gửi yêu cầu kích hoạt.",
       "emptyTitle": "Bạn chưa có gian hàng",
-      "emptyDesc": "Tạo gian hàng đầu tiên để bắt đầu bán sản phẩm và sử dụng các tính năng quản trị dành cho nhà bán hàng.",
+      "emptyDesc": "Tạo gian hàng để bắt đầu bán sản phẩm.",
       "createStore": "Tạo gian hàng",
       "statusDraft": "Bản nháp",
       "statusPendingActive": "Chờ kích hoạt",
@@ -398,13 +383,42 @@
         "deleted": "Đã xoá sản phẩm.",
         "approved": "Đã duyệt sản phẩm thành công."
       }
+    },
+    "wallet": {
+      "tabTransactions": "Lịch sử giao dịch",
+      "tabStatement": "Biến động số dư",
+      "statementTitle": "Báo cáo biến động số dư",
+      "statementDesc": "Tóm tắt biến động số dư và giao dịch theo khoảng thời gian.",
+      "from": "Từ:",
+      "to": "Đến:",
+      "openingBalance": "Số dư đầu kỳ",
+      "closingBalance": "Số dư cuối kỳ",
+      "netChange": "Thay đổi ròng",
+      "totalTopup": "Tổng nạp tiền",
+      "totalPayment": "Tổng thanh toán",
+      "succeededTxCount": "Số giao dịch (Thành công)",
+      "succeededTxCountUnit": "GD",
+      "emptyTitle": "Không có dữ liệu",
+      "emptyDesc": "Không có biến động số dư trong kỳ này.",
+      "txTitle": "Lịch sử giao dịch ví",
+      "txDesc": "Danh sách chi tiết các giao dịch nạp tiền, thanh toán và hoàn tiền của bạn.",
+      "txHeaderCode": "Mã GD",
+      "txHeaderTime": "Thời gian",
+      "txHeaderDesc": "Mô tả",
+      "txHeaderAmount": "Số tiền",
+      "txHeaderStatus": "Trạng thái",
+      "txStatusSuccess": "Thành công",
+      "txStatusPending": "Đang xử lý",
+      "txStatusFailed": "Thất bại",
+      "emptyTxTitle": "Chưa có giao dịch",
+      "emptyTxDesc": "Lịch sử giao dịch sẽ hiển thị tại đây."
     }
   },
   "Wishlist": {
     "title": "Danh Sách Yêu Thích",
     "description": "Lưu trữ những sản phẩm bạn yêu thích và muốn sở hữu nhất.",
     "empty": "Danh sách đang trống",
-    "emptyDesc": "Khám phá hàng ngàn sản phẩm cao cấp và thêm chúng vào danh sách yêu thích của bạn.",
+    "emptyDesc": "Sản phẩm yêu thích của bạn sẽ hiển thị tại đây.",
     "exploreNow": "Khám phá ngay",
     "clearAll": "Xóa tất cả",
     "toastTitle": "Danh sách yêu thích",
@@ -496,31 +510,10 @@
     "existingStoreTitle": "Tài khoản này đã có gian hàng",
     "existingStoreDesc": "Bạn đang sở hữu gian hàng {name}. Hãy vào trang tài khoản để tiếp tục cập nhật hồ sơ, chính sách hoặc gửi yêu cầu kích hoạt.",
     "existingStoreDescNoName": "Tài khoản này đã có gian hàng. Hãy vào trang tài khoản để tiếp tục cập nhật hồ sơ, chính sách hoặc gửi yêu cầu kích hoạt.",
-    "existingStoreStatus": "Trạng thái hiện tại: {status}",
     "manageStore": "Quản lý gian hàng",
     "toastSuccess": "Đăng ký gian hàng thành công!",
     "alreadyHasStoreToast": "Tài khoản này đã có gian hàng. Mở trang quản lý để tiếp tục nhé.",
     "toastError": "Đã có lỗi xảy ra.",
     "fetchError": "Không thể gửi yêu cầu. Vui lòng thử lại."
-  },
-  "Admin": {
-    "title": "Bảng điều khiển Admin",
-    "approvals": {
-      "title": "Duyệt gian hàng",
-      "subtitle": "Danh sách các yêu cầu xác minh đang chờ xử lý",
-      "noPending": "Không có gian hàng nào đang chờ duyệt.",
-      "approve": "Duyệt",
-      "reject": "Từ chối",
-      "approving": "Đang duyệt...",
-      "success": "Đã duyệt gian hàng thành công",
-      "error": "Lỗi khi duyệt gian hàng",
-      "table": {
-        "name": "Tên gian hàng",
-        "owner": "Chủ sở hữu",
-        "location": "Địa điểm",
-        "date": "Ngày gửi",
-        "actions": "Hành động"
-      }
-    }
   }
 }

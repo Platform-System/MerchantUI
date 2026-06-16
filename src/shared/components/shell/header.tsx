@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Link } from "@/i18n/navigation"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTranslations } from "next-intl"
 import { cn } from "@platform-system/design-ui/lib/cn"
@@ -29,21 +29,34 @@ import {
   LogOut,
   LogIn,
   Settings,
+  Wallet,
+  Store,
+  ArrowRight,
 } from "lucide-react"
 import { useAuth } from "@/core/providers/AuthProvider"
 import { SearchModal } from "@/features/search/components/search-modal"
 import { useCart } from "@/features/cart"
 import { useWishlist } from "@/features/wishlist"
 import { useCategories } from "@/shared/lib/category-queries"
+import { useQuery } from "@tanstack/react-query"
+import { fetchMyWallet } from "@/features/store/queries/wallet-queries"
 
 export function Header() {
   const t = useTranslations("Common")
   const [isScrolled, setIsScrolled] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
   const { setIsOpen: setIsCartOpen, cartCount, isOpen: isCartOpen } = useCart()
   const { wishlistCount } = useWishlist()
   const { isAuthenticated, login, logout, keycloak } = useAuth()
   const { data: categories = [] } = useCategories()
+
+  const { data: wallet } = useQuery({
+    queryKey: ["wallet", "me"],
+    queryFn: fetchMyWallet,
+    enabled: isAuthenticated,
+    staleTime: 30 * 1000,
+  })
 
   const isActive = (path: string) => {
     const fullPath = pathname.startsWith("/") ? pathname : `/${pathname}`
@@ -58,6 +71,7 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isCategoryOpen, setIsCategoryOpen] = useState(false)
+  const [mobileSearchQuery, setMobileSearchQuery] = useState("")
 
   useEffect(() => {
     const container = document.getElementById("store-scroll-container")
@@ -196,8 +210,6 @@ export function Header() {
                 <span className="sr-only">Danh sách yêu thích</span>
               </Link>
 
-
-
               <Button
                 variant="ghost"
                 size="icon"
@@ -244,42 +256,50 @@ export function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon-lg" className="relative rounded-full ml-1 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0">
-                      <Avatar className="size-9 transition-transform hover:scale-110 active:scale-95">
+                      <Avatar className="size-9 transition-transform hover:scale-110 active:scale-95" showDropdownIndicator>
                         <AvatarImage src="" alt="User" />
-                        <AvatarFallback className="bg-[rgb(var(--store-accent-rgb))] text-background">
+                        <AvatarFallback>
                           <User className="size-5" />
                         </AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          {keycloak?.idTokenParsed?.name || "Người dùng"}
-                        </p>
-                        <p className="text-xs leading-none text-muted-foreground">
-                          {keycloak?.idTokenParsed?.preferred_username || "Chào mừng bạn quay lại"}
-                        </p>
-                      </div>
-                    </DropdownMenuLabel>
+                  <DropdownMenuContent className="w-56" align="end" alignOffset={5} forceMount>
+                    <DropdownMenuItem asChild className="cursor-pointer font-normal p-2">
+                      <Link href="/profile" className="flex items-center gap-3 w-full">
+                        <Avatar className="size-9">
+                          <AvatarImage src="" alt="User" />
+                          <AvatarFallback>
+                            <User className="size-5" />
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-lg font-semibold text-foreground">
+                          {keycloak?.idTokenParsed?.preferred_username || "Người dùng"}
+                        </span>
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link href="/account" className="cursor-pointer">
-                        <User className="mr-2 h-4 w-4" />
-                        <span>Hồ sơ cá nhân</span>
+                      <Link href="/space?tab=store" className="cursor-pointer">
+                        <Store className="mr-2 h-4 w-4" />
+                        <span>Gian hàng</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/account/orders" className="cursor-pointer">
+                      <Link href="/space?tab=orders" className="cursor-pointer">
                         <ShoppingBag className="mr-2 h-4 w-4" />
                         <span>Đơn hàng</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/account/settings" className="cursor-pointer">
-                        <Settings className="mr-2 h-4 w-4" />
-                        <span>Cài đặt</span>
+                      <Link href="/space?tab=wallet" className="cursor-pointer">
+                        <Wallet className="mr-2 h-4 w-4" />
+                        <span className="flex items-center justify-between w-full gap-2">
+                          <span>Ví</span>
+                          <span className="text-[10px] font-bold bg-[rgb(var(--store-accent-rgb)/0.1)] px-1.5 py-0.5 rounded store-accent-text shrink-0">
+                            {wallet ? `${wallet.balance.toLocaleString("vi-VN")} đ` : "0 đ"}
+                          </span>
+                        </span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -325,17 +345,34 @@ export function Header() {
               className="bg-[rgb(var(--store-surface-strong-rgb)/0.95)] backdrop-blur-xl lg:hidden"
             >
               <div className="px-4 py-6 space-y-4">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => {
-                    setIsSearchOpen(true)
-                    setIsMobileMenuOpen(false)
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    const searchVal = mobileSearchQuery.trim()
+                    if (searchVal) {
+                      setIsMobileMenuOpen(false)
+                      router.push(`/marketplace?search=${encodeURIComponent(searchVal)}`)
+                    }
                   }}
+                  className="relative w-full"
                 >
-                  <Search className="h-4 w-4 mr-2" />
-                  Tìm sản phẩm...
-                </Button>
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={mobileSearchQuery}
+                    onChange={(e) => setMobileSearchQuery(e.target.value)}
+                    placeholder="Tìm sản phẩm..."
+                    className="h-10 w-full rounded-lg border border-border bg-[rgb(var(--store-surface-rgb)/0.84)] pl-10 pr-10 text-sm text-foreground outline-none focus:border-foreground"
+                  />
+                  {mobileSearchQuery.trim() && (
+                    <button
+                      type="submit"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 transition-colors rounded-md hover:bg-muted/50 flex items-center justify-center"
+                    >
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                  )}
+                </form>
 
                 <nav className="space-y-2">
                   <Link
@@ -365,6 +402,13 @@ export function Header() {
                     </AccordionItem>
                   </Accordion>
                   <Link
+                    href="/sellers"
+                    className="block px-4 py-3 rounded-lg hover:bg-muted transition-colors font-medium text-sm"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Nhà bán hàng
+                  </Link>
+                  <Link
                     href="/wishlist"
                     className="block px-4 py-3 rounded-lg hover:bg-muted transition-colors font-medium flex items-center justify-between text-sm"
                     onClick={() => setIsMobileMenuOpen(false)}
@@ -377,13 +421,6 @@ export function Header() {
                     )}
                   </Link>
                   <Link
-                    href="/sellers"
-                    className="block px-4 py-3 rounded-lg hover:bg-muted transition-colors font-medium text-sm"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Nhà bán hàng
-                  </Link>
-                  <Link
                     href="/become-seller"
                     className="block px-4 py-3 rounded-lg hover:bg-muted transition-colors font-medium text-sm"
                     onClick={() => setIsMobileMenuOpen(false)}
@@ -393,21 +430,26 @@ export function Header() {
                   {isAuthenticated ? (
                     <>
                       <Link
-                        href="/account"
-                        className="block px-4 py-3 rounded-lg hover:bg-muted transition-colors font-medium text-sm flex items-center"
+                        href="/profile"
+                        className="block px-4 py-3 rounded-lg hover:bg-muted transition-colors font-medium text-sm"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
-                        <User className="h-4 w-4 mr-2" />
-                        Tài khoản của tôi
+                        Hồ sơ cá nhân
+                      </Link>
+                      <Link
+                        href="/space"
+                        className="block px-4 py-3 rounded-lg hover:bg-muted transition-colors font-medium text-sm"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        Trung tâm cá nhân
                       </Link>
                       <button
-                        className="w-full px-4 py-3 text-left rounded-lg hover:bg-muted transition-colors font-medium text-sm flex items-center text-destructive"
+                        className="w-full px-4 py-3 text-left rounded-lg hover:bg-muted transition-colors font-medium text-sm text-destructive"
                         onClick={() => {
                           setIsMobileMenuOpen(false);
                           logout();
                         }}
                       >
-                        <LogOut className="h-4 w-4 mr-2" />
                         Đăng xuất
                       </button>
                     </>

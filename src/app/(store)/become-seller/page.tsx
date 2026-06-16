@@ -117,7 +117,7 @@ export default function BecomeSellerPage() {
                 {t("existingStoreDescNoName")}
               </p>
               <Button asChild className="store-accent-button store-accent-button-strong mt-4 rounded-xl">
-                <Link href="/account">{t("manageStore")}</Link>
+                <Link href="/space?tab=store">{t("manageStore")}</Link>
               </Button>
             </div>
           ) : isSubmitted ? (

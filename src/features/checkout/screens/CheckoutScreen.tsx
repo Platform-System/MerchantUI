@@ -33,6 +33,7 @@ export function CheckoutScreen() {
     grandTotal,
     handlePlaceOrder,
     orderSuccess,
+    wallet,
   } = useCheckout()
 
   React.useLayoutEffect(() => {
@@ -150,12 +151,31 @@ export function CheckoutScreen() {
                 {[
                   { id: "wallet" as const, title: t("wallet"), description: t("walletDesc") },
                   { id: "payment" as const, title: t("payment"), description: t("paymentDesc") },
-                ].map((method) => (
-                  <button key={method.id} onClick={() => setPaymentMethod(method.id)} className={`rounded-2xl border p-4 text-left transition-all ${paymentMethod === method.id ? "store-accent-soft border-[rgb(var(--store-accent-rgb)/0.25)]" : "store-surface-soft border-[rgb(var(--store-border-rgb)/0.7)] hover:bg-[rgb(var(--store-accent-rgb)/0.06)]"}`}>
-                    <p className="font-medium text-foreground">{method.title}</p>
-                    <p className="store-muted-text mt-1 text-sm leading-6">{method.description}</p>
-                  </button>
-                ))}
+                ].map((method) => {
+                  const isWallet = method.id === "wallet"
+                  const isInsufficient = isWallet && wallet && wallet.balance < grandTotal
+                  return (
+                    <button
+                      key={method.id}
+                      onClick={() => setPaymentMethod(method.id)}
+                      className={`rounded-2xl border p-4 text-left transition-all ${
+                        paymentMethod === method.id
+                          ? "store-accent-soft border-[rgb(var(--store-accent-rgb)/0.25)]"
+                          : "store-surface-soft border-[rgb(var(--store-border-rgb)/0.7)] hover:bg-[rgb(var(--store-accent-rgb)/0.06)]"
+                      }`}
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                        <p className="font-medium text-foreground">{method.title}</p>
+                        {isWallet && wallet && (
+                          <span className={`text-xs font-semibold ${isInsufficient ? "text-destructive" : "text-emerald-500"}`}>
+                            Số dư: {wallet.balance.toLocaleString("vi-VN")} đ {isInsufficient && "(Không đủ số dư)"}
+                          </span>
+                        )}
+                      </div>
+                      <p className="store-muted-text mt-1 text-sm leading-6">{method.description}</p>
+                    </button>
+                  )
+                })}
               </div>
             </div>
           </section>

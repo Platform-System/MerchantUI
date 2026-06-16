@@ -13,7 +13,7 @@ import {
 import { cn } from "@platform-system/design-ui/lib/cn"
 
 const customerLinks = [
-  { href: "/account", icon: User, label: "Tổng quan tài khoản" },
+  { href: "/space", icon: User, label: "Tổng quan tài khoản" },
   { href: "/wishlist", icon: Heart, label: "Danh sách yêu thích" },
   { href: "/become-seller", icon: Store, label: "Mở gian hàng" },
 ]
@@ -84,4 +84,3 @@ export function AccountSidebar() {
     </aside>
   )
 }
-

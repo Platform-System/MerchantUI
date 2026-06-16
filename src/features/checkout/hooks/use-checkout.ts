@@ -11,6 +11,8 @@ import {
 } from "../constants"
 import { apiClient } from "@/shared/api/api-client"
 import { Result } from "@/types/api"
+import { useQuery } from "@tanstack/react-query"
+import { fetchMyWallet } from "@/features/store/queries/wallet-queries"
 
 interface CheckoutOrderAddressResponse {
   recipientName?: string | null
@@ -53,6 +55,12 @@ export function useCheckout() {
   const [formData, setFormData] = React.useState<CheckoutFormData>(DEFAULT_FORM_DATA)
   const [formError, setFormError] = React.useState<string | null>(null)
   const [orderSuccess, setOrderSuccess] = React.useState<StoreOrder | null>(null)
+
+  const { data: wallet } = useQuery({
+    queryKey: ["wallet", "me"],
+    queryFn: fetchMyWallet,
+    staleTime: 10 * 1000,
+  })
 
   const shippingFee = deliveryMethod === "express" ? 12 : 0
   const taxAmount = Math.round(cartTotal * 0.08)
@@ -97,6 +105,17 @@ export function useCheckout() {
       return
     }
 
+    if (paymentMethod === "wallet") {
+      if (!wallet) {
+        toast.error("Không thể lấy thông tin ví. Vui lòng thử lại.")
+        return
+      }
+      if (wallet.balance < grandTotal) {
+        toast.error("Số dư ví không đủ để thanh toán đơn hàng này.")
+        return
+      }
+    }
+
     setIsSubmitting(true)
     setFormError(null)
 
@@ -117,22 +136,24 @@ export function useCheckout() {
       if (response.data && response.data.success && response.data.data) {
         const order = response.data.data
 
+        // Gọi API thanh toán thực tế (Wallet trừ tiền ví, hoặc Cổng thanh toán tạo link)
+        const checkoutResponse = await apiClient.post<Result<{ checkoutUrl?: string | null, status: number }>>(
+          `/api/ordering/orders/${order.orderCode}/checkout`,
+          {
+            paymentMethod: paymentMethod, // "wallet" hoặc "payment"
+            provider: "PayOS"
+          }
+        )
+
         let status: StoreOrder["status"] = "pending"
-        // Map OrderStatus enum to StoreOrder['status']
-        // Pending = 1, Paid = 2, Failed = 3, Cancelled = 4
-        switch (order.status) {
-          case 1:
-            status = "pending"
-            break
-          case 2:
+        let checkoutUrl: string | null = null
+
+        if (checkoutResponse.data && checkoutResponse.data.success && checkoutResponse.data.data) {
+          const checkoutData = checkoutResponse.data.data
+          checkoutUrl = checkoutData.checkoutUrl || null
+          if (checkoutData.status === 2 || paymentMethod === "wallet") {
             status = "processing"
-            break
-          case 3:
-            status = "pending"
-            break
-          case 4:
-            status = "pending"
-            break
+          }
         }
 
         const expiredDate = order.expiredAt ? new Date(order.expiredAt) : new Date()
@@ -150,7 +171,7 @@ export function useCheckout() {
           addressLine: order.address?.streetAddress || formData.addressLine.trim(),
           deliveryNote: order.shipment?.note || formData.deliveryNote.trim(),
           deliveryMethod: order.shipment?.method === "express" ? "express" : "standard",
-          paymentMethod: "payment",
+          paymentMethod: paymentMethod,
           items: (order.items || []).map((item) => ({
             id: item.productId,
             name: item.name,
@@ -169,9 +190,21 @@ export function useCheckout() {
 
         setOrderSuccess(orderPayload)
         clearCart()
-        toast.success("Đặt hàng thành công", {
-          description: `Đơn hàng ${orderPayload.id} đã được tạo.`,
-        })
+        
+        if (paymentMethod === "wallet") {
+          toast.success("Thanh toán thành công", {
+            description: `Đơn hàng ${orderPayload.id} đã thanh toán bằng ví.`,
+          })
+        } else if (checkoutUrl) {
+          toast.success("Tạo đơn hàng thành công! Đang chuyển hướng...", {
+            description: `Đang chuyển hướng sang cổng thanh toán.`,
+          })
+          window.location.href = checkoutUrl
+        } else {
+          toast.success("Đặt hàng thành công", {
+            description: `Đơn hàng ${orderPayload.id} đã được tạo.`,
+          })
+        }
       } else {
         const errorMsg = response.data?.message || "Đặt hàng không thành công. Vui lòng kiểm tra lại."
         setFormError(errorMsg)
@@ -208,5 +241,6 @@ export function useCheckout() {
     grandTotal,
     handlePlaceOrder,
     orderSuccess,
+    wallet,
   }
 }
