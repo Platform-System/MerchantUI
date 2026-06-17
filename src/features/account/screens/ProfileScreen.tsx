@@ -49,12 +49,18 @@ export function ProfileScreen() {
 
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[rgb(var(--store-border-rgb)/0.6)] pb-6">
               <div className="flex items-center gap-4">
-                <div className="relative size-20 overflow-hidden rounded-full border border-[rgb(var(--store-border-rgb)/0.85)]">
-                  <Image src={profile.avatar} alt={profile.name} fill className="object-cover" />
+                <div className="relative size-20 overflow-hidden rounded-full border border-[rgb(var(--store-border-rgb)/0.85)] flex items-center justify-center bg-[rgb(var(--store-surface-soft-rgb))]">
+                  {profile.avatar ? (
+                    <Image src={profile.avatar} alt={profile.name} fill className="object-cover" />
+                  ) : (
+                    <User className="size-8 text-muted-foreground" />
+                  )}
                 </div>
                 <div>
                   <h4 className="text-lg font-semibold">{profile.name}</h4>
-                  <p className="text-xs text-muted-foreground">{t("joinedSince")} {profile.joinedDate}</p>
+                  {profile.joinedDate && (
+                    <p className="text-xs text-muted-foreground">{t("joinedSince")} {profile.joinedDate}</p>
+                  )}
                 </div>
               </div>
 

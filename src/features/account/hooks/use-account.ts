@@ -13,6 +13,8 @@ import { fetchMyWallet, fetchMyWalletTransactions, fetchMyWalletStatement, walle
 interface AccountProfileResponse {
   userName?: string | null
   email?: string | null
+  avatarUrl?: string | null
+  createdAt?: string | null
 }
 
 interface OrderAddressResponse {
@@ -72,7 +74,16 @@ export function useAccount() {
       try {
         const response = await apiClient.get<Result<AccountProfileResponse>>("/api/identity/users/me")
         if (response.data && response.data.success && response.data.data) {
-          return response.data.data
+          const profile = response.data.data
+          try {
+            const avatarResponse = await apiClient.get<Result<{ url?: string | null }>>("/api/identity/users/me/images/avatar")
+            if (avatarResponse.data && avatarResponse.data.success && avatarResponse.data.data?.url) {
+              profile.avatarUrl = avatarResponse.data.data.url
+            }
+          } catch (avatarError) {
+            // Ignored if user hasn't set an avatar yet
+          }
+          return profile
         }
       } catch (error) {
         const apiError = error as AxiosError
@@ -81,7 +92,16 @@ export function useAccount() {
             // Tự động gọi API sync để đồng bộ tài khoản mới từ Keycloak và khởi tạo ví
             const syncResponse = await apiClient.post<Result<AccountProfileResponse>>("/api/identity/users/sync")
             if (syncResponse.data && syncResponse.data.success && syncResponse.data.data) {
-              return syncResponse.data.data
+              const profile = syncResponse.data.data
+              try {
+                const avatarResponse = await apiClient.get<Result<{ url?: string | null }>>("/api/identity/users/me/images/avatar")
+                if (avatarResponse.data && avatarResponse.data.success && avatarResponse.data.data?.url) {
+                  profile.avatarUrl = avatarResponse.data.data.url
+                }
+              } catch (avatarError) {
+                // Ignored
+              }
+              return profile
             }
           } catch (syncError) {
             console.error("Loi khi sync session nguoi dung:", syncError)
@@ -152,8 +172,10 @@ export function useAccount() {
       const nextProfile: StoreProfile = {
         name: profileData.userName || profileData.email || DEFAULT_PROFILE.name,
         email: profileData.email || DEFAULT_PROFILE.email,
-        avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${profileData.userName || "user"}`,
-        joinedDate: "October 2024",
+        avatar: profileData.avatarUrl || "",
+        joinedDate: profileData.createdAt
+          ? new Date(profileData.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+          : "",
       }
 
       const timer = window.setTimeout(() => {
