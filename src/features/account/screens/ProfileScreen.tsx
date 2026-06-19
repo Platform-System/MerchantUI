@@ -523,7 +523,7 @@ export function ProfileScreen() {
         title={t("updateCoverTitle")}
         circular={false}
         aspectRatio={4} // 4:1 aspect ratio
-        outputSize={3072}
+        outputSize={1920}
         onSave={async (croppedBase64, originalBase64, cropState) => {
           if (!identityId) return
           try {
