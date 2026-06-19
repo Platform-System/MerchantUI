@@ -19,12 +19,12 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-16 md:grid-cols-2 lg:grid-cols-12 lg:gap-12">
           {/* Brand Info - Left Side (3/12) */}
           <div className="lg:col-span-3">
-            <Link href="/" className="inline-block mb-8">
-              <span className="font-serif text-2xl font-bold tracking-tighter text-foreground uppercase">
+            <Link href="/" className="inline-block mb-3">
+              <span className="font-serif text-2xl font-bold tracking-tighter text-foreground uppercase leading-none">
                 {t("brandName")}<span className="text-primary">.</span>
               </span>
             </Link>
-            <p className="text-muted-foreground text-xs leading-relaxed mb-8 max-w-[240px]">
+            <p className="text-muted-foreground text-xs leading-normal mb-4 max-w-[240px]">
               {t("brandDescription")}
             </p>
             <div className="flex gap-6">
@@ -37,61 +37,43 @@ export function Footer() {
           </div>
 
           {/* Link Columns - Center (6/12) */}
-          <div className="lg:col-span-6">
-            <div className="grid grid-cols-1 gap-10 sm:grid-cols-3 md:gap-8">
+          <div className="lg:col-span-6 md:pt-[12px]">
+            <div className="flex flex-col gap-10 sm:flex-row lg:justify-center sm:gap-16">
               <div className="border-b border-primary/5 pb-10 sm:border-none sm:pb-0">
-                <h4 className="font-serif text-[12px] font-bold uppercase tracking-[0.25em] text-foreground mb-8">
+                <h4 className="font-serif text-[12px] font-bold uppercase tracking-[0.1em] text-foreground mb-4 leading-none">
                   {t("sections.brand")}
                 </h4>
-                <ul className="space-y-5">
-                  <li><Link href="#" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80 hover:text-primary transition-colors">{t("links.story")}</Link></li>
-                  <li><Link href="#" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80 hover:text-primary transition-colors">{t("links.craftsmanship")}</Link></li>
-                  <li><Link href="#" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80 hover:text-primary transition-colors">{t("links.philosophy")}</Link></li>
+                <ul className="space-y-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80 leading-tight">
+                  <li><Link href="#" className="hover:text-primary transition-colors">{t("links.story")}</Link></li>
                 </ul>
               </div>
               <div className="border-b border-primary/5 pb-10 sm:border-none sm:pb-0">
-                <h4 className="font-serif text-[12px] font-bold uppercase tracking-[0.25em] text-foreground mb-8">
+                <h4 className="font-serif text-[12px] font-bold uppercase tracking-[0.1em] text-foreground mb-4 leading-none">
                   {t("sections.support")}
                 </h4>
-                <ul className="space-y-5">
-                  <li><Link href="#" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80 hover:text-primary transition-colors">{t("links.helpCenter")}</Link></li>
-                  <li><Link href="#" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80 hover:text-primary transition-colors">{t("links.shippingReturns")}</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-serif text-[12px] font-bold uppercase tracking-[0.25em] text-foreground mb-8">
-                  {t("sections.connect")}
-                </h4>
-                <ul className="space-y-5">
-                  <li className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80 leading-loose">
-                    {t("links.hotline")}: <br/>
-                    <span className="text-foreground font-semibold tracking-normal text-sm">{t("links.hotlineValue")}</span>
-                  </li>
-                  <li className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80 leading-loose">
-                    {t("links.email")}: <br/>
-                    <span className="text-foreground font-semibold tracking-normal break-all">{t("links.emailValue")}</span>
-                  </li>
+                <ul className="space-y-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80 leading-tight">
+                  <li><Link href="#" className="hover:text-primary transition-colors">{t("links.helpCenter")}</Link></li>
                 </ul>
               </div>
             </div>
           </div>
 
           {/* Newsletter - Right Side (3/12) */}
-          <div className="lg:col-span-3">
-            <h4 className="font-serif text-[12px] font-bold uppercase tracking-[0.25em] text-foreground mb-8">
+          <div className="lg:col-span-3 md:pt-[12px]">
+            <h4 className="font-serif text-[12px] font-bold uppercase tracking-[0.1em] text-foreground mb-3 leading-none">
               {t("sections.subscribe")}
             </h4>
-            <p className="text-xs font-medium text-muted-foreground/60 mb-8 leading-relaxed">
+            <p className="text-muted-foreground text-xs leading-normal mb-4">
               {t("newsletter.description")}
             </p>
-            <div className="relative group">
+            <div className="relative group max-w-[240px]">
               <div className="flex items-center p-1 bg-muted/30 border border-primary/10 rounded-full focus-within:bg-muted/50 focus-within:border-primary/30 transition-all duration-300">
                 <input
                   type="email"
                   placeholder={t("newsletter.placeholder")}
-                  className="w-full bg-transparent border-none pl-5 pr-28 h-11 text-xs font-medium placeholder:text-muted-foreground/40 focus:outline-none focus:ring-0"
+                  className="w-full bg-transparent border-none pl-5 pr-20 h-9 text-xs font-medium placeholder:text-muted-foreground/40 focus:outline-none focus:ring-0"
                 />
-                <button className="absolute right-1 bg-foreground text-background h-9 px-5 rounded-full font-serif text-[10px] font-bold uppercase tracking-widest hover:bg-primary transition-colors duration-300">
+                <button className="absolute right-1 top-1/2 -translate-y-1/2 bg-foreground text-background h-9 px-5 rounded-full font-serif text-[10px] font-bold uppercase tracking-widest hover:bg-primary transition-colors duration-300">
                   {t("newsletter.button")}
                 </button>
               </div>

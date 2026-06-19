@@ -8,5 +8,14 @@ export const DEFAULT_PROFILE: StoreProfile = {
   email: "",
   avatar: "",
   joinedDate: "",
+  displayName: "",
+  bio: "",
+  location: "",
+  gender: "",
+  dateOfBirth: "",
+  phoneNumber: "",
+  firstName: "",
+  lastName: "",
+  cover: "",
 }
 

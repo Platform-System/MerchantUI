@@ -11,10 +11,21 @@ import { Result } from "@/types/api"
 import { fetchMyWallet, fetchMyWalletTransactions, fetchMyWalletStatement, walletQueryKeys } from "@/features/store/queries/wallet-queries"
 
 interface AccountProfileResponse {
+  id?: string | null
+  identityId?: string | null
   userName?: string | null
   email?: string | null
   avatarUrl?: string | null
+  coverUrl?: string | null
   createdAt?: string | null
+  displayName?: string | null
+  bio?: string | null
+  location?: string | null
+  gender?: string | null
+  dateOfBirth?: string | null
+  phoneNumber?: string | null
+  firstName?: string | null
+  lastName?: string | null
 }
 
 interface OrderAddressResponse {
@@ -54,6 +65,61 @@ interface OrdersListResponse {
   items?: OrderSummaryResponse[] | null
 }
 
+async function fetchFullProfile(profile: AccountProfileResponse): Promise<AccountProfileResponse> {
+  const [avatarRes, coverRes, profileRes] = await Promise.allSettled([
+    apiClient.get<Result<{ url?: string | null }>>("/api/identity/users/me/images/avatar"),
+    apiClient.get<Result<{ url?: string | null }>>("/api/identity/users/me/images/cover"),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    apiClient.get<Result<any>>("/api/identity/users/me/profile")
+  ])
+
+  if (avatarRes.status === "fulfilled" && avatarRes.value.data?.success && avatarRes.value.data.data?.url) {
+    profile.avatarUrl = avatarRes.value.data.data.url
+  }
+
+  if (coverRes.status === "fulfilled" && coverRes.value.data?.success && coverRes.value.data.data?.url) {
+    profile.coverUrl = coverRes.value.data.data.url
+  }
+
+  if (typeof window !== "undefined") {
+    if (profile.avatarUrl && profile.avatarUrl.includes("/local-avatar-fallback/")) {
+      const localAvatar = localStorage.getItem("user_avatar_" + profile.identityId)
+      if (localAvatar) {
+        profile.avatarUrl = localAvatar
+      }
+    } else if (!profile.avatarUrl && profile.identityId) {
+      const localAvatar = localStorage.getItem("user_avatar_" + profile.identityId)
+      if (localAvatar) {
+        profile.avatarUrl = localAvatar
+      }
+    }
+
+    if (profile.coverUrl && profile.coverUrl.includes("/local-cover-fallback/")) {
+      const localCover = localStorage.getItem("user_cover_" + profile.identityId)
+      if (localCover) {
+        profile.coverUrl = localCover
+      }
+    } else if (!profile.coverUrl && profile.identityId) {
+      const localCover = localStorage.getItem("user_cover_" + profile.identityId)
+      if (localCover) {
+        profile.coverUrl = localCover
+      }
+    }
+  }
+
+  if (profileRes.status === "fulfilled" && profileRes.value.data?.success && profileRes.value.data.data) {
+    const details = profileRes.value.data.data
+    profile.displayName = details.displayName
+    profile.bio = details.bio
+    profile.location = details.location
+    profile.gender = details.gender
+    profile.dateOfBirth = details.dateOfBirth
+    profile.phoneNumber = details.phoneNumber
+  }
+
+  return profile
+}
+
 export function useAccount() {
   const searchParams = useSearchParams()
   const initialTab = searchParams.get("tab") || "orders"
@@ -74,16 +140,7 @@ export function useAccount() {
       try {
         const response = await apiClient.get<Result<AccountProfileResponse>>("/api/identity/users/me")
         if (response.data && response.data.success && response.data.data) {
-          const profile = response.data.data
-          try {
-            const avatarResponse = await apiClient.get<Result<{ url?: string | null }>>("/api/identity/users/me/images/avatar")
-            if (avatarResponse.data && avatarResponse.data.success && avatarResponse.data.data?.url) {
-              profile.avatarUrl = avatarResponse.data.data.url
-            }
-          } catch (avatarError) {
-            // Ignored if user hasn't set an avatar yet
-          }
-          return profile
+          return await fetchFullProfile(response.data.data)
         }
       } catch (error) {
         const apiError = error as AxiosError
@@ -92,16 +149,7 @@ export function useAccount() {
             // Tự động gọi API sync để đồng bộ tài khoản mới từ Keycloak và khởi tạo ví
             const syncResponse = await apiClient.post<Result<AccountProfileResponse>>("/api/identity/users/sync")
             if (syncResponse.data && syncResponse.data.success && syncResponse.data.data) {
-              const profile = syncResponse.data.data
-              try {
-                const avatarResponse = await apiClient.get<Result<{ url?: string | null }>>("/api/identity/users/me/images/avatar")
-                if (avatarResponse.data && avatarResponse.data.success && avatarResponse.data.data?.url) {
-                  profile.avatarUrl = avatarResponse.data.data.url
-                }
-              } catch (avatarError) {
-                // Ignored
-              }
-              return profile
+              return await fetchFullProfile(syncResponse.data.data)
             }
           } catch (syncError) {
             console.error("Loi khi sync session nguoi dung:", syncError)
@@ -167,19 +215,50 @@ export function useAccount() {
     retry: false,
   })
 
-  React.useEffect(() => {
+  const resetProfile = React.useCallback(() => {
     if (profileData) {
-      const nextProfile: StoreProfile = {
-        name: profileData.userName || profileData.email || DEFAULT_PROFILE.name,
-        email: profileData.email || DEFAULT_PROFILE.email,
-        avatar: profileData.avatarUrl || "",
-        joinedDate: profileData.createdAt
-          ? new Date(profileData.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })
-          : "",
+      let avatar = profileData.avatarUrl || ""
+      let cover = profileData.coverUrl || ""
+
+      if (typeof window !== "undefined" && profileData.identityId) {
+        if (!avatar || avatar.includes("/local-avatar-fallback/")) {
+          const localAvatar = localStorage.getItem("user_avatar_" + profileData.identityId)
+          if (localAvatar) {
+            avatar = localAvatar
+          }
+        }
+        if (!cover || cover.includes("/local-cover-fallback/")) {
+          const localCover = localStorage.getItem("user_cover_" + profileData.identityId)
+          if (localCover) {
+            cover = localCover
+          }
+        }
       }
 
+      setProfile({
+        name: profileData.userName || profileData.email || DEFAULT_PROFILE.name,
+        email: profileData.email || DEFAULT_PROFILE.email,
+        avatar: avatar,
+        joinedDate: profileData.createdAt
+          ? new Date(profileData.createdAt).toLocaleDateString("vi-VN", { month: "long", year: "numeric" })
+          : "",
+        displayName: profileData.displayName || "",
+        bio: profileData.bio || "",
+        location: profileData.location || "",
+        gender: profileData.gender || "",
+        dateOfBirth: profileData.dateOfBirth || "",
+        phoneNumber: profileData.phoneNumber || "",
+        firstName: profileData.firstName || "",
+        lastName: profileData.lastName || "",
+        cover: cover,
+      })
+    }
+  }, [profileData])
+
+  React.useEffect(() => {
+    if (profileData) {
+      setTimeout(() => resetProfile(), 0)
       const timer = window.setTimeout(() => {
-        setProfile(nextProfile)
         // Refetch thông tin ví khi profile đã được đồng bộ / tải thành công
         refetchWallet()
         refetchTransactions()
@@ -188,7 +267,7 @@ export function useAccount() {
 
       return () => window.clearTimeout(timer)
     }
-  }, [profileData])
+  }, [profileData, resetProfile, refetchWallet, refetchTransactions, refetchStatement])
 
   const [isEditingProfile, setIsEditingProfile] = React.useState(false)
   const { wishlistItems } = useWishlist()
@@ -272,6 +351,8 @@ export function useAccount() {
     activeTab,
     setActiveTab,
     profile,
+    identityId: profileData?.identityId || "",
+    refetchProfile,
     orders,
     isEditingProfile,
     setIsEditingProfile,
@@ -291,5 +372,6 @@ export function useAccount() {
     walletStatement,
     refetchStatement,
     isFetchingStatement,
+    resetProfile,
   }
 }

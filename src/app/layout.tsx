@@ -5,7 +5,7 @@ import { BRAND_METADATA } from "@platform-system/design-ui/branding";
 import QueryProvider from "@/core/providers/QueryProvider";
 import AuthProvider from "@/core/providers/AuthProvider";
 import { GlobalLoadingBar } from "@/shared/layout/GlobalLoadingBar";
-import { Toaster } from "sonner";
+import { Toaster } from "@platform-system/design-ui/components/sonner";
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -30,7 +30,7 @@ export default async function RootLayout({
         className={`${plusJakarta.variable} relative h-screen overflow-hidden bg-background text-foreground antialiased transition-colors duration-300`}
       >
         <ThemeProvider defaultTheme="light">
-          <Toaster richColors closeButton position="top-right" />
+          <Toaster />
           <AuthProvider>
             <QueryProvider>
               <div

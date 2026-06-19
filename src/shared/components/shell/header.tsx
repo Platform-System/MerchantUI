@@ -25,6 +25,7 @@ import {
   Menu,
   X,
   ChevronDown,
+  ChevronRight,
   User,
   LogOut,
   LogIn,
@@ -40,6 +41,9 @@ import { useWishlist } from "@/features/wishlist"
 import { useCategories } from "@/shared/lib/category-queries"
 import { useQuery } from "@tanstack/react-query"
 import { fetchMyWallet } from "@/features/store/queries/wallet-queries"
+import { apiClient } from "@/shared/api/api-client"
+import { Result } from "@/types/api"
+
 
 export function Header() {
   const t = useTranslations("Common")
@@ -54,6 +58,44 @@ export function Header() {
   const { data: wallet } = useQuery({
     queryKey: ["wallet", "me"],
     queryFn: fetchMyWallet,
+    enabled: isAuthenticated,
+    staleTime: 30 * 1000,
+  })
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get<Result<{ identityId?: string | null, userName?: string | null, email?: string | null, avatarUrl?: string | null, displayName?: string | null }>>("/api/identity/users/me")
+        if (response.data && response.data.success && response.data.data) {
+          const p = response.data.data
+          try {
+            const [avatarResponse, profileResponse] = await Promise.allSettled([
+              apiClient.get<Result<{ url?: string | null }>>("/api/identity/users/me/images/avatar"),
+              apiClient.get<Result<{ displayName?: string | null }>>("/api/identity/users/me/profile")
+            ])
+            if (avatarResponse.status === "fulfilled" && avatarResponse.value.data && avatarResponse.value.data.success && avatarResponse.value.data.data?.url) {
+              p.avatarUrl = avatarResponse.value.data.data.url
+            }
+            if (profileResponse.status === "fulfilled" && profileResponse.value.data && profileResponse.value.data.success && profileResponse.value.data.data?.displayName) {
+              p.displayName = profileResponse.value.data.data.displayName
+            }
+          } catch (e) {
+            // Ignored
+          }
+          if (typeof window !== "undefined" && p.avatarUrl && p.avatarUrl.includes("/local-avatar-fallback/")) {
+            const localAvatar = localStorage.getItem("user_avatar_" + p.identityId)
+            if (localAvatar) {
+              p.avatarUrl = localAvatar
+            }
+          }
+          return p
+        }
+      } catch (err) {
+        return null
+      }
+      return null
+    },
     enabled: isAuthenticated,
     staleTime: 30 * 1000,
   })
@@ -257,7 +299,7 @@ export function Header() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon-lg" className="relative rounded-full ml-1 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0">
                       <Avatar className="size-9 transition-transform hover:scale-110 active:scale-95" showDropdownIndicator>
-                        <AvatarImage src="" alt="User" />
+                        <AvatarImage src={profile?.avatarUrl || ""} alt="User" className="object-cover" />
                         <AvatarFallback>
                           <User className="size-5" />
                         </AvatarFallback>
@@ -265,17 +307,23 @@ export function Header() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="end" alignOffset={5} forceMount>
-                    <DropdownMenuItem asChild className="cursor-pointer font-normal p-2">
-                      <Link href="/profile" className="flex items-center gap-3 w-full">
-                        <Avatar className="size-9">
-                          <AvatarImage src="" alt="User" />
+                    <DropdownMenuItem asChild className="cursor-pointer font-normal p-2.5 min-w-0 focus:bg-[rgb(var(--store-accent-rgb)/0.05)] focus:text-foreground">
+                      <Link href="/profile" className="flex items-center gap-3 w-full min-w-0">
+                        <Avatar className="size-10 shrink-0 ring-2 ring-[rgb(var(--store-accent-rgb)/0.3)] ring-offset-1 ring-offset-background">
+                          <AvatarImage src={profile?.avatarUrl || ""} alt="User" className="object-cover" />
                           <AvatarFallback>
                             <User className="size-5" />
                           </AvatarFallback>
                         </Avatar>
-                        <span className="text-lg font-semibold text-foreground">
-                          {keycloak?.idTokenParsed?.preferred_username || "Người dùng"}
-                        </span>
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-sm font-semibold text-foreground truncate" title={profile?.displayName || keycloak?.idTokenParsed?.preferred_username || "Người dùng"}>
+                            {profile?.displayName || keycloak?.idTokenParsed?.preferred_username || "Người dùng"}
+                          </span>
+                          <span className="text-xs text-muted-foreground mt-0.5">
+                            Gói: Miễn phí
+                          </span>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground/60 shrink-0 ml-auto" />
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />

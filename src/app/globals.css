@@ -4,6 +4,10 @@
 @source "../../node_modules/@platform-system/design-ui/src/**/*.tsx";
 @import "@platform-system/design-ui/index.css";
 
+@theme {
+  --spacing-30: 7.5rem;
+}
+
 html,
 body {
   height: 100%;
@@ -14,10 +18,11 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  --font-sans: var(--font-plus-jakarta), sans-serif !important;
+  --font-serif: var(--font-sans) !important;
 }
 
 :root {
   --scrollbar-thumb: var(--scrollbar-thumb-zinc);
   --scrollbar-thumb-hover: var(--scrollbar-thumb-zinc-hover);
-  --font-serif: var(--font-sans) !important;
 }

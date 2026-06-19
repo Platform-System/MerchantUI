@@ -17,7 +17,12 @@ configurePlatformApi({
     const status = error.response?.status;
     const message = error.response?.data?.message || error.message;
 
-    if (status === 404 && error.config?.url?.includes('/api/wallet/me')) {
+    if (status === 404 && (
+      error.config?.url?.includes('/api/wallet/me') ||
+      error.config?.url?.includes('/api/identity/users/me/images/avatar') ||
+      error.config?.url?.includes('/api/identity/users/me/images/cover') ||
+      error.config?.url?.includes('/api/identity/users/me/profile')
+    )) {
       return;
     }
 
