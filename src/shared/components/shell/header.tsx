@@ -83,10 +83,19 @@ export function Header() {
           } catch (e) {
             // Ignored
           }
-          if (typeof window !== "undefined" && p.avatarUrl && p.avatarUrl.includes("/local-avatar-fallback/")) {
-            const localAvatar = localStorage.getItem("user_avatar_" + p.identityId)
-            if (localAvatar) {
-              p.avatarUrl = localAvatar
+          if (typeof window !== "undefined" && p.identityId) {
+            if (p.avatarUrl && p.avatarUrl.includes("/local-avatar-fallback/")) {
+              const localAvatar = localStorage.getItem("user_avatar_" + p.identityId)
+              if (localAvatar) {
+                p.avatarUrl = localAvatar
+              } else {
+                p.avatarUrl = ""
+              }
+            } else if (!p.avatarUrl) {
+              const localAvatar = localStorage.getItem("user_avatar_" + p.identityId)
+              if (localAvatar) {
+                p.avatarUrl = localAvatar
+              }
             }
           }
           return p

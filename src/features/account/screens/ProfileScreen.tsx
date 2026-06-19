@@ -24,6 +24,17 @@ import { Textarea } from "@platform-system/design-ui/components/textarea"
 import { DatePicker } from "@platform-system/design-ui/components/date-picker"
 import { cn } from "@platform-system/design-ui/lib/cn"
 
+function dataURLtoFile(dataurl: string, filename: string): File {
+  const arr = dataurl.split(",")
+  const mime = arr[0].match(/:(.*?);/)![1]
+  const bstr = atob(arr[1])
+  let n = bstr.length
+  const u8arr = new Uint8Array(n)
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n)
+  }
+  return new File([u8arr], filename, { type: mime })
+}
 
 interface EditableFieldWrapperProps {
   children: React.ReactNode
@@ -466,14 +477,15 @@ export function ProfileScreen() {
         onSave={async (croppedBase64, originalBase64, cropState) => {
           if (!identityId) return
           try {
-            await apiClient.put(`/api/identity/users/me/images/avatar`, {
-              blobName: "avatar.jpg",
-              containerName: "avatars",
-              fileName: "avatar.jpg",
-              contentType: "image/jpeg",
-              size: croppedBase64.length,
-              altText: "Profile Avatar",
-              url: `/local-avatar-fallback/${identityId}`
+            const file = dataURLtoFile(croppedBase64, "avatar.jpg")
+            const formData = new FormData()
+            formData.append("altText", "Profile Avatar")
+            formData.append("file", file)
+
+            await apiClient.post(`/api/identity/users/me/images/avatar`, formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
             })
 
             localStorage.setItem("user_avatar_" + identityId, croppedBase64)
@@ -507,14 +519,15 @@ export function ProfileScreen() {
         onSave={async (croppedBase64, originalBase64, cropState) => {
           if (!identityId) return
           try {
-            await apiClient.put(`/api/identity/users/me/images/cover`, {
-              blobName: "cover.jpg",
-              containerName: "covers",
-              fileName: "cover.jpg",
-              contentType: "image/jpeg",
-              size: croppedBase64.length,
-              altText: "Profile Cover Banner",
-              url: `/local-cover-fallback/${identityId}`
+            const file = dataURLtoFile(croppedBase64, "cover.jpg")
+            const formData = new FormData()
+            formData.append("altText", "Profile Cover Banner")
+            formData.append("file", file)
+
+            await apiClient.post(`/api/identity/users/me/images/cover`, formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
             })
 
             localStorage.setItem("user_cover_" + identityId, croppedBase64)

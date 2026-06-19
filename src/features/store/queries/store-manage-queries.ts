@@ -126,3 +126,26 @@ export async function updateStoreMemberPublishPermission(userId: string, request
   const response = await apiClient.put<Result<unknown>>(`/api/store/manage/stores/members/${userId}/publish-permission`, request)
   return response.data
 }
+
+export interface UserProfileResponse {
+  id: string
+  identityId: string
+  userName: string
+  email: string
+  firstName?: string | null
+  lastName?: string | null
+  createdAt: string
+}
+
+export async function fetchUserProfileById(userId: string): Promise<UserProfileResponse | null> {
+  try {
+    const response = await apiClient.get<Result<UserProfileResponse>>(`/api/identity/users/${userId}`)
+    if (response.data?.success && response.data.data) {
+      return response.data.data
+    }
+    return null
+  } catch (error) {
+    console.error(`Loi khi lay thong tin user ${userId}:`, error)
+    return null
+  }
+}

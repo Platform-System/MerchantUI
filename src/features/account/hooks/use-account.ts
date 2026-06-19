@@ -86,6 +86,8 @@ async function fetchFullProfile(profile: AccountProfileResponse): Promise<Accoun
       const localAvatar = localStorage.getItem("user_avatar_" + profile.identityId)
       if (localAvatar) {
         profile.avatarUrl = localAvatar
+      } else {
+        profile.avatarUrl = ""
       }
     } else if (!profile.avatarUrl && profile.identityId) {
       const localAvatar = localStorage.getItem("user_avatar_" + profile.identityId)
@@ -98,6 +100,8 @@ async function fetchFullProfile(profile: AccountProfileResponse): Promise<Accoun
       const localCover = localStorage.getItem("user_cover_" + profile.identityId)
       if (localCover) {
         profile.coverUrl = localCover
+      } else {
+        profile.coverUrl = ""
       }
     } else if (!profile.coverUrl && profile.identityId) {
       const localCover = localStorage.getItem("user_cover_" + profile.identityId)
@@ -225,12 +229,16 @@ export function useAccount() {
           const localAvatar = localStorage.getItem("user_avatar_" + profileData.identityId)
           if (localAvatar) {
             avatar = localAvatar
+          } else {
+            avatar = ""
           }
         }
         if (!cover || cover.includes("/local-cover-fallback/")) {
           const localCover = localStorage.getItem("user_cover_" + profileData.identityId)
           if (localCover) {
             cover = localCover
+          } else {
+            cover = ""
           }
         }
       }
