@@ -354,6 +354,7 @@ export function useAccount() {
     identityId: profileData?.identityId || "",
     refetchProfile,
     orders,
+    ordersData,
     isEditingProfile,
     setIsEditingProfile,
     wishlistItems,
@@ -374,4 +375,50 @@ export function useAccount() {
     isFetchingStatement,
     resetProfile,
   }
+}
+
+export interface OrderDetailsResponse {
+  id: string
+  userId: string
+  orderCode: number
+  totalAmount: number
+  expiredAt: string
+  status: number // 1 = Pending, 2 = Paid, 3 = Failed, 4 = Cancelled
+  checkoutUrl?: string | null
+  address?: {
+    recipientName: string
+    phoneNumber: string
+    city: string
+    district: string
+    ward: string
+    streetAddress: string
+  } | null
+  shipment?: {
+    note: string
+    method: string
+    fee: number
+  } | null
+  items: Array<{
+    productId: string
+    name: string
+    price: number
+    quantity: number
+  }>
+}
+
+export function useOrderDetails(orderId: string | null) {
+  return useQuery({
+    queryKey: ["orders", orderId],
+    queryFn: async (): Promise<OrderDetailsResponse | null> => {
+      if (!orderId) return null
+      const response = await apiClient.get<Result<OrderDetailsResponse>>(`/api/ordering/orders/${orderId}`)
+      if (response.data && response.data.success && response.data.data) {
+        return response.data.data
+      }
+      return null
+    },
+    enabled: !!orderId,
+    staleTime: 30 * 1000,
+    retry: false,
+  })
 }

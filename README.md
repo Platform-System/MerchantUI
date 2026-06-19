@@ -53,6 +53,10 @@ See `.env.example` for the default local setup.
   Used by account order history.
   Source: `src/features/account/hooks/use-account.ts`
 
+- `GET /api/ordering/orders/{orderId}`
+  Used by account order details screen.
+  Source: `src/features/account/hooks/use-account.ts`
+
 - `GET /api/ordering/carts`
   Used to hydrate the current cart from backend.
   Source: `src/features/cart/context/CartContext.tsx`

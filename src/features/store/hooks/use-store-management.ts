@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { AxiosError } from "axios"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
+import { getValidToken } from "@/shared/api/api-client"
 import {
   acceptStoreInvitation,
   fetchMyStoreMembers,
@@ -15,6 +16,25 @@ import {
   updateMyStorePolicy,
   updateMyStoreProfile,
 } from "../queries/store-manage-queries"
+
+function parseJwt(token: string) {
+  try {
+    const base64Url = token.split(".")[1]
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
+    const binString = typeof window !== "undefined"
+      ? window.atob(base64)
+      : Buffer.from(base64, "base64").toString("binary")
+    const jsonPayload = decodeURIComponent(
+      binString
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    )
+    return JSON.parse(jsonPayload)
+  } catch (e) {
+    return null
+  }
+}
 
 export function useStoreManagement() {
   const t = useTranslations("Account.store")
@@ -62,9 +82,31 @@ export function useStoreManagement() {
 
   const [acceptInviteStoreId, setAcceptInviteStoreId] = React.useState("")
 
+  const [hasStoreFromToken, setHasStoreFromToken] = React.useState<boolean | null>(null)
+
+  React.useEffect(() => {
+    async function checkToken() {
+      try {
+        const token = await getValidToken()
+        if (token) {
+          const payload = parseJwt(token)
+          console.log(">>> JWT Payload:", payload);
+          const hasStore = payload && "hasStore" in payload ? (payload.hasStore === true || payload.hasStore === "true") : false
+          setHasStoreFromToken(hasStore)
+        } else {
+          setHasStoreFromToken(false)
+        }
+      } catch (e) {
+        setHasStoreFromToken(false)
+      }
+    }
+    checkToken()
+  }, [])
+
   const { data: myStore, isLoading, isFetching } = useQuery({
     queryKey: storeManageQueryKeys.me,
     queryFn: fetchMyStore,
+    enabled: hasStoreFromToken === true,
     staleTime: 60 * 1000,
   })
 

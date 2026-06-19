@@ -10,7 +10,8 @@ import { Textarea } from "@platform-system/design-ui/components/textarea"
 import { DatePicker } from "@platform-system/design-ui/components/date-picker"
 import { User, Package, Heart, Settings, LogOut, ShoppingBag, Store, Loader2, Wallet, Receipt } from "lucide-react"
 import { Link } from "@/i18n/navigation"
-import { useAccount } from "../hooks/use-account"
+import { useAccount, useOrderDetails } from "../hooks/use-account"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@platform-system/design-ui/components/dialog"
 import { StoreOrder } from "@/types/store"
 import { useStoreManagement } from "@/features/store/hooks/use-store-management"
 import { useStoreProductManagement } from "@/features/store/hooks/use-store-product-management"
@@ -28,6 +29,7 @@ export function AccountScreen() {
     setActiveTab,
     profile,
     orders,
+    ordersData,
     isEditingProfile,
     setIsEditingProfile,
     wishlistItems,
@@ -105,6 +107,9 @@ export function AccountScreen() {
     startEditingProduct,
   } = useStoreProductManagement(myStore?.profile.name, hasStore)
 
+  const [selectedOrderId, setSelectedOrderId] = React.useState<string | null>(null)
+  const { data: orderDetails, isLoading: isLoadingOrderDetails } = useOrderDetails(selectedOrderId)
+
   const [topupAmount, setTopupAmount] = React.useState("")
   const [isTopupLoading, setIsTopupLoading] = React.useState(false)
   const [walletSubTab, setWalletSubTab] = React.useState<"transactions" | "statement">("transactions")
@@ -177,28 +182,28 @@ export function AccountScreen() {
       <div className="mx-auto max-w-none px-4 sm:px-6 lg:px-8">
         <h1 className="mb-8 font-serif text-3xl font-bold sm:text-4xl">Trung tâm cá nhân</h1>
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-6">
-          <div className="flex shrink-0 flex-row gap-2 overflow-x-auto border-b border-[rgb(var(--store-border-rgb)/0.7)] pb-4 md:flex-col md:overflow-visible md:border-b-0 md:pb-0">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
+          <div className="flex shrink-0 flex-row gap-2 overflow-x-auto border-b border-[rgb(var(--store-border-rgb)/0.7)] pb-4 md:col-span-3 lg:col-span-2 md:flex-col md:overflow-visible md:border-b-0 md:pb-0">
             {tabs.map((tab) => {
               const Icon = tab.icon
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-medium transition-all border ${
+                  className={`flex shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-4 py-3 text-sm font-medium transition-all border md:w-full md:justify-start ${
                     activeTab === tab.id
                       ? "store-accent-soft border-[rgb(var(--store-accent-rgb)/0.18)] text-foreground"
                       : "border-transparent text-muted-foreground hover:bg-[rgb(var(--store-accent-rgb)/0.08)] hover:text-foreground"
                   }`}
                 >
-                  <Icon className={`h-5 w-5 ${activeTab === tab.id ? "store-accent-text" : ""}`} />
+                  <Icon className={`h-5 w-5 shrink-0 ${activeTab === tab.id ? "store-accent-text" : ""}`} />
                   <span>{tab.label}</span>
                 </button>
               )
             })}
           </div>
 
-          <div className="ds-glass-panel rounded-3xl p-6 shadow-2xl sm:p-8 md:col-span-5">
+          <div className="ds-glass-panel rounded-3xl p-6 shadow-2xl sm:p-8 md:col-span-9 lg:col-span-10">
             {activeTab === "orders" && (
               <div className="flex flex-col gap-6">
                 <div className="space-y-1">
@@ -230,6 +235,20 @@ export function AccountScreen() {
                             <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusClassName(order.status)}`}>
                               {getTranslatedStatus(order.status)}
                             </span>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="rounded-xl border-[rgb(var(--store-accent-rgb)/0.3)] text-foreground hover:bg-[rgb(var(--store-accent-rgb)/0.08)]"
+                              onClick={() => {
+                                const cleanId = order.id.startsWith("#") ? order.id.slice(1) : order.id
+                                const rawOrder = ordersData?.find(o => o.orderCode?.toString() === cleanId || o.id === cleanId)
+                                if (rawOrder) {
+                                  setSelectedOrderId(rawOrder.id)
+                                }
+                              }}
+                            >
+                              Xem chi tiết
+                            </Button>
                           </div>
                         </div>
                       </div>
@@ -1144,6 +1163,116 @@ export function AccountScreen() {
           </div>
         </div>
       </div>
+      {/* Modal chi tiết đơn hàng */}
+      <Dialog open={selectedOrderId !== null} onOpenChange={(open) => { if (!open) setSelectedOrderId(null) }}>
+        <DialogContent className="max-w-2xl overflow-y-auto max-h-[85vh] ds-glass-panel border border-[rgb(var(--store-border-rgb)/0.7)] rounded-3xl p-6 sm:p-8">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-2xl font-semibold text-foreground">
+              Chi tiết đơn hàng {orderDetails?.orderCode ? `#${orderDetails.orderCode}` : ""}
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Thông tin chi tiết về trạng thái đơn hàng và các mặt hàng đã mua.
+            </DialogDescription>
+          </DialogHeader>
+
+          {isLoadingOrderDetails ? (
+            <div className="flex h-48 items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : orderDetails ? (
+            <div className="space-y-6 text-sm text-foreground">
+              {/* 1. Trạng thái đơn hàng */}
+              <div className="flex justify-between items-center p-4 rounded-2xl store-surface-soft border border-[rgb(var(--store-border-rgb)/0.5)]">
+                <div>
+                  <p className="font-medium text-foreground">Trạng thái thanh toán</p>
+                  <p className="text-xs text-muted-foreground">
+                    Hạn thanh toán: {new Date(orderDetails.expiredAt).toLocaleString("vi-VN")}
+                  </p>
+                </div>
+                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                  orderDetails.status === 2 ? "bg-emerald-500/10 text-emerald-700" :
+                  orderDetails.status === 1 ? "bg-amber-500/10 text-amber-700" : "bg-rose-500/10 text-rose-700"
+                }`}>
+                  {orderDetails.status === 1 ? "Chờ thanh toán" :
+                   orderDetails.status === 2 ? "Đã thanh toán" :
+                   orderDetails.status === 3 ? "Thanh toán thất bại" : "Đã hủy"}
+                </span>
+              </div>
+
+              {/* 2. Địa chỉ giao hàng & Shipment */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 rounded-2xl store-surface-soft border border-[rgb(var(--store-border-rgb)/0.5)]">
+                  <h4 className="font-semibold text-foreground mb-2">Thông tin người nhận</h4>
+                  {orderDetails.address ? (
+                    <div className="space-y-1 text-muted-foreground text-xs">
+                      <p className="font-medium text-foreground">{orderDetails.address.recipientName}</p>
+                      <p>{orderDetails.address.phoneNumber}</p>
+                      <p>{`${orderDetails.address.streetAddress}, ${orderDetails.address.ward}, ${orderDetails.address.district}, ${orderDetails.address.city}`}</p>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">Không có địa chỉ giao hàng.</p>
+                  )}
+                </div>
+
+                <div className="p-4 rounded-2xl store-surface-soft border border-[rgb(var(--store-border-rgb)/0.5)]">
+                  <h4 className="font-semibold text-foreground mb-2">Vận chuyển</h4>
+                  {orderDetails.shipment ? (
+                    <div className="space-y-1 text-muted-foreground text-xs">
+                      <p>Phương thức: <span className="font-medium text-foreground capitalize">{orderDetails.shipment.method}</span></p>
+                      <p>Phí vận chuyển: <span className="font-medium text-foreground">${orderDetails.shipment.fee.toLocaleString()}</span></p>
+                      {orderDetails.shipment.note && (
+                        <p className="italic">Ghi chú: {orderDetails.shipment.note}</p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">Không có thông tin vận chuyển.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* 3. Danh sách sản phẩm */}
+              <div className="border border-[rgb(var(--store-border-rgb)/0.5)] rounded-2xl overflow-hidden">
+                <div className="bg-[rgb(var(--store-accent-rgb)/0.04)] px-4 py-3 border-b border-[rgb(var(--store-border-rgb)/0.5)]">
+                  <h4 className="font-semibold text-foreground">Sản phẩm đã chọn</h4>
+                </div>
+                <div className="divide-y divide-[rgb(var(--store-border-rgb)/0.3)]">
+                  {orderDetails.items.map((item) => (
+                    <div key={item.productId} className="flex justify-between items-center p-4">
+                      <div>
+                        <p className="font-medium text-foreground">{item.name}</p>
+                        <p className="text-xs text-muted-foreground">Số lượng: {item.quantity}</p>
+                      </div>
+                      <span className="font-semibold text-foreground">
+                        ${(item.price * item.quantity).toLocaleString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 4. Tổng cộng */}
+              <div className="flex justify-between items-center pt-2 border-t border-[rgb(var(--store-border-rgb)/0.5)] text-base font-bold">
+                <span>Tổng số tiền:</span>
+                <span className="store-accent-text">${orderDetails.totalAmount.toLocaleString()}</span>
+              </div>
+
+              {/* 5. Nút thanh toán lại nếu đơn hàng đang Pending và có link thanh toán */}
+              {orderDetails.status === 1 && orderDetails.checkoutUrl && (
+                <Button 
+                  asChild 
+                  className="w-full store-accent-button store-accent-button-strong rounded-xl py-3 font-semibold text-center block mt-6"
+                >
+                  <a href={orderDetails.checkoutUrl} target="_blank" rel="noopener noreferrer">
+                    Thanh toán ngay qua Cổng Thanh Toán
+                  </a>
+                </Button>
+              )}
+            </div>
+          ) : (
+            <p className="text-center py-8 text-muted-foreground">Không tìm thấy thông tin đơn hàng.</p>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

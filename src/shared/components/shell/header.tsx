@@ -232,18 +232,18 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="hidden sm:flex"
+                className="hidden sm:flex shrink-0"
                 onClick={() => setIsSearchOpen(true)}
               >
-                <Search className="h-5 w-5" />
+                <Search className="h-5 w-5 shrink-0" />
                 <span className="sr-only">Tìm kiếm</span>
               </Button>
 
               <Link
                 href="/wishlist"
-                className="relative hidden sm:inline-flex items-center justify-center size-9 rounded-md text-foreground hover:bg-[rgb(var(--store-accent-rgb)/0.1)] hover:text-foreground transition-colors"
+                className="relative hidden sm:inline-flex items-center justify-center size-9 rounded-md text-foreground hover:bg-[rgb(var(--store-accent-rgb)/0.1)] hover:text-foreground transition-colors shrink-0"
               >
-                <Heart className="h-5 w-5" />
+                <Heart className="h-5 w-5 shrink-0" />
                 {wishlistCount > 0 && (
                   <Badge variant="counter" className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border-none p-0 text-[9px] font-semibold shadow-sm">
                     {wishlistCount}
@@ -255,15 +255,16 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative text-foreground hover:store-accent-text"
+                className="relative text-foreground hover:store-accent-text shrink-0"
                 onClick={() => setIsCartOpen(true)}
               >
                 <motion.div
                   key={cartCount}
                   animate={cartCount > 0 ? { scale: [1, 1.2, 1] } : {}}
                   transition={{ duration: 0.4, ease: "backOut" }}
+                  className="shrink-0"
                 >
-                  <ShoppingBag className="h-5 w-5" />
+                  <ShoppingBag className="h-5 w-5 shrink-0" />
                   {cartCount > 0 && (
                     <Badge variant="counter" className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-none p-0 text-[10px] font-semibold shadow-sm">
                       {cartCount}
@@ -280,16 +281,17 @@ export function Header() {
                   animate={{ scale: 1, rotate: 0, opacity: 1 }}
                   exit={{ scale: 0, rotate: 90, opacity: 0 }}
                   transition={{ type: "spring", bounce: 0.4, duration: 0.35 }}
+                  className="shrink-0"
                 >
                   <Button
                     variant="ghost"
                     size="icon-lg"
                     onClick={() => setIsCartOpen(false)}
-                    className="relative rounded-full ml-1 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                    className="relative rounded-full ml-1 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 shrink-0"
                   >
-                    <Avatar className="size-9">
-                      <AvatarFallback className="bg-foreground text-background">
-                        <X className="size-5" />
+                    <Avatar className="size-9 shrink-0">
+                      <AvatarFallback className="bg-foreground text-background shrink-0">
+                        <X className="size-5 shrink-0" />
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -297,11 +299,11 @@ export function Header() {
               ) : isAuthenticated ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon-lg" className="relative rounded-full ml-1 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0">
-                      <Avatar className="size-9 transition-transform hover:scale-110 active:scale-95" showDropdownIndicator>
-                        <AvatarImage src={profile?.avatarUrl || ""} alt="User" className="object-cover" />
-                        <AvatarFallback>
-                          <User className="size-5" />
+                    <Button variant="ghost" size="icon-lg" className="relative rounded-full ml-1 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 shrink-0">
+                      <Avatar className="size-9 transition-transform hover:scale-110 active:scale-95 shrink-0" showDropdownIndicator>
+                        <AvatarImage src={profile?.avatarUrl || ""} alt="User" className="object-cover shrink-0" />
+                        <AvatarFallback className="shrink-0">
+                          <User className="size-5 shrink-0" />
                         </AvatarFallback>
                       </Avatar>
                     </Button>
@@ -362,9 +364,9 @@ export function Header() {
                   variant="ghost" 
                   size="sm" 
                   onClick={login} 
-                  className="hidden sm:flex items-center gap-2 ml-2 text-foreground hover:store-accent-text font-medium"
+                  className="hidden sm:flex items-center gap-2 ml-2 text-foreground hover:store-accent-text font-medium shrink-0"
                 >
-                  <LogIn className="h-4 w-4" />
+                  <LogIn className="h-4 w-4 shrink-0" />
                   <span>Đăng nhập</span>
                 </Button>
               )}
@@ -373,10 +375,10 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden"
+                className="lg:hidden shrink-0"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               >
-                {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                {isMobileMenuOpen ? <X className="h-5 w-5 shrink-0" /> : <Menu className="h-5 w-5 shrink-0" />}
               </Button>
             </div>
           </div>
