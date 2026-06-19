@@ -139,7 +139,7 @@ export function useAccount() {
   }, [searchParams])
 
   const { data: profileData, refetch: refetchProfile } = useQuery({
-    queryKey: ["profile"],
+    queryKey: ["account-profile"],
     queryFn: async (): Promise<AccountProfileResponse | null> => {
       try {
         const response = await apiClient.get<Result<AccountProfileResponse>>("/api/identity/users/me")
