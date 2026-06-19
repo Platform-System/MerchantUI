@@ -488,13 +488,21 @@ export function ProfileScreen() {
               },
             })
 
-            localStorage.setItem("user_avatar_" + identityId, croppedBase64)
+            try {
+              localStorage.setItem("user_avatar_" + identityId, croppedBase64)
+              if (originalBase64) {
+                localStorage.setItem("user_avatar_original_" + identityId, originalBase64)
+              }
+              if (cropState) {
+                localStorage.setItem("user_avatar_crop_state_" + identityId, JSON.stringify(cropState))
+              }
+            } catch (storageError) {
+              console.warn("Storage quota exceeded, unable to cache avatar image locally:", storageError)
+            }
             if (originalBase64) {
-              localStorage.setItem("user_avatar_original_" + identityId, originalBase64)
               setCurrentOriginalImageUrl(originalBase64)
             }
             if (cropState) {
-              localStorage.setItem("user_avatar_crop_state_" + identityId, JSON.stringify(cropState))
               setInitialCropState(cropState)
             }
             toast.success(t("updateAvatarSuccess"))
@@ -530,13 +538,21 @@ export function ProfileScreen() {
               },
             })
 
-            localStorage.setItem("user_cover_" + identityId, croppedBase64)
+            try {
+              localStorage.setItem("user_cover_" + identityId, croppedBase64)
+              if (originalBase64) {
+                localStorage.setItem("user_cover_original_" + identityId, originalBase64)
+              }
+              if (cropState) {
+                localStorage.setItem("user_cover_crop_state_" + identityId, JSON.stringify(cropState))
+              }
+            } catch (storageError) {
+              console.warn("Storage quota exceeded, unable to cache cover image locally:", storageError)
+            }
             if (originalBase64) {
-              localStorage.setItem("user_cover_original_" + identityId, originalBase64)
               setCurrentOriginalCoverImageUrl(originalBase64)
             }
             if (cropState) {
-              localStorage.setItem("user_cover_crop_state_" + identityId, JSON.stringify(cropState))
               setInitialCoverCropState(cropState)
             }
             toast.success(t("updateCoverSuccess"))
