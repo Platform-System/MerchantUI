@@ -9,7 +9,7 @@ import {
   DeliveryMethod, 
   PaymentMethod 
 } from "../constants"
-import { apiClient } from "@/shared/api/api-client"
+import { apiClient } from "@/shared/api/apiClient"
 import { Result } from "@/types/api"
 import { useQuery } from "@tanstack/react-query"
 import { fetchMyWallet } from "@/features/store/queries/wallet-queries"

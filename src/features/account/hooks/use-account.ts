@@ -6,7 +6,7 @@ import { StoreOrder, StoreProfile } from "@/types/store"
 import { DEFAULT_PROFILE } from "../constants"
 import { useWishlist } from "@/features/wishlist"
 import { useCart } from "@/features/cart"
-import { apiClient } from "@/shared/api/api-client"
+import { apiClient } from "@/shared/api/apiClient"
 import { Result } from "@/types/api"
 import { fetchMyWallet, fetchMyWalletTransactions, fetchMyWalletStatement, walletQueryKeys } from "@/features/store/queries/wallet-queries"
 

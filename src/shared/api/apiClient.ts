@@ -40,5 +40,3 @@ export const apiClient = getApiClient();
 export const publicApiClient = getPublicApiClient();
 export const keycloak = getKeycloak();
 export const getValidToken = getValidTokenShared;
-
-

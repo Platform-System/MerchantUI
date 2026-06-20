@@ -1,3 +1,3 @@
-export { keycloak, getValidToken } from './api-client';
+export { keycloak, getValidToken } from './apiClient';
 
 

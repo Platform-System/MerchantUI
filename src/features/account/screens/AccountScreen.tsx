@@ -3,8 +3,8 @@
 import * as React from "react"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
-import { Avatar, AvatarFallback, AvatarImage, Button, DatePicker, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle, Input, Textarea } from '@platform-system/design-ui';
-import { User, Package, Heart, Settings, LogOut, ShoppingBag, Store, Loader2, Wallet, Receipt } from "lucide-react"
+import { Avatar, AvatarFallback, Button, DatePicker, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle, Input, Textarea } from '@platform-system/design-ui';
+import { User, Package, Store, Loader2, Wallet, Receipt } from "lucide-react"
 import { Link } from "@/i18n/navigation"
 import { useAccount, useOrderDetails } from "../hooks/use-account"
 import { useQuery } from "@tanstack/react-query"
@@ -109,31 +109,21 @@ function MemberRow({
 export function AccountScreen() {
   const t = useTranslations("Account")
   const tc = useTranslations("Cart")
-  const tp = useTranslations("Product")
   const ts = useTranslations("Account.store")
   
   const {
     activeTab,
     setActiveTab,
-    profile,
     orders,
     ordersData,
-    isEditingProfile,
-    setIsEditingProfile,
-    wishlistItems,
-    addToCart,
-    updateProfileField,
     statusClassName,
     wallet,
     walletTransactions,
-    refetchWallet,
-    refetchTransactions,
     statementFrom,
     setStatementFrom,
     statementTo,
     setStatementTo,
     walletStatement,
-    refetchStatement,
     isFetchingStatement,
   } = useAccount()
   const {

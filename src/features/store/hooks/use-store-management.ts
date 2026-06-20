@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { AxiosError } from "axios"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
-import { getValidToken } from "@/shared/api/api-client"
+import { getValidToken } from "@/shared/api/apiClient"
 import {
   acceptStoreInvitation,
   fetchMyStoreMembers,
@@ -31,7 +31,7 @@ function parseJwt(token: string) {
         .join("")
     )
     return JSON.parse(jsonPayload)
-  } catch (e) {
+  } catch {
     return null
   }
 }
@@ -96,7 +96,7 @@ export function useStoreManagement() {
         } else {
           setHasStoreFromToken(false)
         }
-      } catch (e) {
+      } catch {
         setHasStoreFromToken(false)
       }
     }

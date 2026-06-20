@@ -1,5 +1,5 @@
 import { resolveCategoryImage, slugify } from "@/shared/lib/storefront-normalizers";
-import { publicApiClient } from "@/shared/api/api-client";
+import { publicApiClient } from "@/shared/api/apiClient";
 import { useQuery } from "@tanstack/react-query";
 import { Result, PagedResult } from "@/types/api";
 import { fetchAllProducts } from "@/features/product/queries/product-queries";

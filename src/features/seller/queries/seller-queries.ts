@@ -1,5 +1,5 @@
 import { Seller } from "@/types/store"
-import { apiClient, publicApiClient } from "@/shared/api/api-client"
+import { apiClient, publicApiClient } from "@/shared/api/apiClient"
 import { Result, PagedResult } from "@/types/api"
 import {
   buildSellerLookup,

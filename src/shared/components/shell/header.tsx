@@ -4,8 +4,7 @@ import { useState, useEffect } from "react"
 import { Link } from "@/i18n/navigation"
 import { usePathname, useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { useTranslations } from "next-intl"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Avatar, AvatarFallback, AvatarImage, Badge, Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, cn } from '@platform-system/design-ui';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Avatar, AvatarFallback, AvatarImage, Badge, Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, cn } from '@platform-system/design-ui';
 import {
   Search,
   ShoppingBag,
@@ -17,7 +16,6 @@ import {
   User,
   LogOut,
   LogIn,
-  Settings,
   Wallet,
   Store,
   ArrowRight,
@@ -29,12 +27,11 @@ import { useWishlist } from "@/features/wishlist"
 import { useCategories } from "@/shared/lib/category-queries"
 import { useQuery } from "@tanstack/react-query"
 import { fetchMyWallet } from "@/features/store/queries/wallet-queries"
-import { apiClient } from "@/shared/api/api-client"
+import { apiClient } from "@/shared/api/apiClient"
 import { Result } from "@/types/api"
 
 
 export function Header() {
-  const t = useTranslations("Common")
   const [isScrolled, setIsScrolled] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
@@ -68,7 +65,7 @@ export function Header() {
             if (profileResponse.status === "fulfilled" && profileResponse.value.data && profileResponse.value.data.success && profileResponse.value.data.data?.displayName) {
               p.displayName = profileResponse.value.data.data.displayName
             }
-          } catch (e) {
+          } catch {
             // Ignored
           }
           if (typeof window !== "undefined" && p.identityId) {
@@ -88,7 +85,7 @@ export function Header() {
           }
           return p
         }
-      } catch (err) {
+      } catch {
         return null
       }
       return null

@@ -1,4 +1,4 @@
-import { apiClient, publicApiClient } from "@/shared/api/api-client"
+import { apiClient, publicApiClient } from "@/shared/api/apiClient"
 import type { AxiosError } from "axios"
 import type { PagedResult, Result } from "@/types/api"
 import type { CatalogProductResponse } from "@/shared/lib/storefront-normalizers"
