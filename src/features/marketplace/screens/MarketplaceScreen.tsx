@@ -4,25 +4,7 @@ import { Suspense, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { Search, SlidersHorizontal, Grid3X3, LayoutGrid, ChevronDown, X } from "lucide-react"
-import { Button } from "@platform-system/design-ui/components/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@platform-system/design-ui/components/dropdown-menu"
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@platform-system/design-ui/components/pagination"
-import { Input } from "@platform-system/design-ui/components/input"
-import { EmptyStatePanel } from "@platform-system/design-ui/components/empty-state-panel"
-import { Spinner } from "@platform-system/design-ui/components/spinner"
-import { cn } from "@platform-system/design-ui/lib/cn"
+import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, EmptyStatePanel, Input, Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, Spinner, cn } from '@platform-system/design-ui';
 import { ProductCard } from "@/features/product"
 import { FilterSidebar } from "../components/filter-sidebar"
 import { useQuery } from "@tanstack/react-query"

@@ -4,31 +4,7 @@ import React, { useState, useEffect } from "react"
 import { Plus, Minus, Trash2, ShoppingBag, Truck } from "lucide-react"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@platform-system/design-ui/components/alert-dialog"
-import { Button } from "@platform-system/design-ui/components/button"
-import { Empty, EmptyMedia, EmptyTitle } from "@platform-system/design-ui/components/empty"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@platform-system/design-ui/components/select"
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-} from "@platform-system/design-ui/components/sheet"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, Button, Empty, EmptyMedia, EmptyTitle, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Sheet, SheetContent, SheetTitle } from '@platform-system/design-ui';
 import { useCart } from "../context/CartContext"
 import type { CartItem } from "../store/cart-store"
 import { Link } from "@/i18n/navigation"

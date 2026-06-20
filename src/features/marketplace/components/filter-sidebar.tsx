@@ -2,13 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import { X } from "lucide-react"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@platform-system/design-ui/components/accordion"
-import { Button } from "@platform-system/design-ui/components/button"
-import { Checkbox } from "@platform-system/design-ui/components/checkbox"
-import { OverlayBackdrop } from "@platform-system/design-ui/components/overlay-backdrop"
-import { RatingStars } from "@platform-system/design-ui/components/rating-stars"
-import { Slider } from "@platform-system/design-ui/components/slider"
-import { cn } from "@platform-system/design-ui/lib/cn"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button, Checkbox, OverlayBackdrop, RatingStars, Slider, cn } from '@platform-system/design-ui';
 import { useQuery } from "@tanstack/react-query"
 import { fetchAllCategories, categoryQueryKeys } from "@/shared/lib/category-queries"
 import { fetchAllSellers, sellerQueryKeys } from "@/features/seller"

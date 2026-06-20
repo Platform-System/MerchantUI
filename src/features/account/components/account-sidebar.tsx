@@ -10,7 +10,7 @@ import {
   Store,
   LogOut,
 } from "lucide-react"
-import { cn } from "@platform-system/design-ui/lib/cn"
+import { cn } from '@platform-system/design-ui';
 
 const customerLinks = [
   { href: "/space", icon: User, label: "Tổng quan tài khoản" },

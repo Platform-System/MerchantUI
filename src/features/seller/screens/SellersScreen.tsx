@@ -1,9 +1,7 @@
 import { useTranslations } from "next-intl"
 import { useState, useLayoutEffect, useMemo } from "react"
 import { Store } from "lucide-react"
-import { FilterBar } from "@platform-system/design-ui/components/filter-bar"
-import { EmptyStatePanel } from "@platform-system/design-ui/components/empty-state-panel"
-import { Spinner } from "@platform-system/design-ui/components/spinner"
+import { EmptyStatePanel, FilterBar, Spinner } from '@platform-system/design-ui';
 import { SellerCard } from "../components/seller-card"
 import { useQuery } from "@tanstack/react-query"
 import { fetchAllSellers, sellerQueryKeys } from "../queries/seller-queries"

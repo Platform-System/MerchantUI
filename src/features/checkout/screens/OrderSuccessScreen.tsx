@@ -5,8 +5,7 @@ import { motion } from "framer-motion"
 import confetti from "canvas-confetti"
 import { CheckCircle2, ShoppingBag, ArrowRight, Package, Truck, Clock } from "lucide-react"
 import { Link } from "@/i18n/navigation"
-import { BRAND_NAME } from "@platform-system/design-ui/branding"
-import { Button } from "@platform-system/design-ui/components/button"
+import { BRAND_NAME, Button } from '@platform-system/design-ui';
 import { useTranslations } from "next-intl"
 import { StoreOrder } from "@/types/store"
 

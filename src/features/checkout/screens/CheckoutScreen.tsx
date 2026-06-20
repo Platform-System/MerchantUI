@@ -4,15 +4,10 @@ import React from "react"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
 import { ArrowLeft, CheckCircle2, CreditCard, MapPin, ShieldCheck, Truck } from "lucide-react"
-import { Button } from "@platform-system/design-ui/components/button"
-import { InfoPanel } from "@platform-system/design-ui/components/info-panel"
-import { Input } from "@platform-system/design-ui/components/input"
-import { SurfaceIcon } from "@platform-system/design-ui/components/surface-icon"
-import { Textarea } from "@platform-system/design-ui/components/textarea"
+import { Button, EmptyStatePanel, InfoPanel, Input, SurfaceIcon, Textarea } from '@platform-system/design-ui';
 import { Link } from "@/i18n/navigation"
 import { useCheckout } from "../hooks/use-checkout"
 import { OrderSuccessScreen } from "./OrderSuccessScreen"
-import { EmptyStatePanel } from "@platform-system/design-ui/components/empty-state-panel"
 
 export function CheckoutScreen() {
   const t = useTranslations("Checkout")

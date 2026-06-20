@@ -1,6 +1,6 @@
 "use client"
 
-import { Skeleton } from "@platform-system/design-ui/components/skeleton"
+import { Skeleton } from '@platform-system/design-ui';
 
 export function ProductDetailSkeleton() {
   return (

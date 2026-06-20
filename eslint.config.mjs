@@ -11,19 +11,18 @@ const eslintConfig = defineConfig([
       "no-restricted-imports": [
         "error",
         {
-          paths: [
+          patterns: [
             {
-              name: "@platform-system/design-ui",
-              message:
-                "Use public subpaths like @platform-system/design-ui/components/*, /lib/cn, /theme-provider, or /branding.",
-            },
-            {
-              name: "@platform-system/design-ui/ThemeProvider",
-              message: "Use @platform-system/design-ui/theme-provider instead.",
-            },
-            {
-              name: "@platform-system/design-ui/useTheme",
-              message: "Use @platform-system/design-ui/use-theme instead.",
+              group: [
+                "@platform-system/design-ui/components/*",
+                "@platform-system/design-ui/theme-provider",
+                "@platform-system/design-ui/use-theme",
+                "@platform-system/design-ui/branding",
+                "@platform-system/design-ui/lib/cn",
+                "@platform-system/design-ui/ThemeProvider",
+                "@platform-system/design-ui/useTheme",
+              ],
+              message: "Import from the root package \"@platform-system/design-ui\" instead.",
             },
           ],
         },

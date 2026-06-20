@@ -2,8 +2,7 @@
 
 import * as React from "react"
 import { motion, type HTMLMotionProps } from "framer-motion"
-import { Button } from "@platform-system/design-ui/components/button"
-import { cn } from "@platform-system/design-ui/lib/cn"
+import { Button, cn } from '@platform-system/design-ui';
 import { Link } from "@/i18n/navigation"
 import { ArrowRight } from "lucide-react"
 

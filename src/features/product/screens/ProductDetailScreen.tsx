@@ -21,20 +21,12 @@ import {
   MapPin,
   MessageCircle,
 } from "lucide-react"
-import { Button } from "@platform-system/design-ui/components/button"
-import { Calendar } from "@platform-system/design-ui/components/calendar"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@platform-system/design-ui/components/chart"
-import { InfoPanel } from "@platform-system/design-ui/components/info-panel"
-import { RatingStars } from "@platform-system/design-ui/components/rating-stars"
-import { SurfaceIcon } from "@platform-system/design-ui/components/surface-icon"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@platform-system/design-ui/components/tabs"
-import { cn } from "@platform-system/design-ui/lib/cn"
+import { Button, Calendar, ChartContainer, ChartTooltip, ChartTooltipContent, EmptyStatePanel, InfoPanel, RatingStars, SurfaceIcon, Tabs, TabsContent, TabsList, TabsTrigger, cn } from '@platform-system/design-ui';
 import { Link } from "@/i18n/navigation"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 import { ProductDetailSkeleton } from "../index"
 import { useProductDetail } from "../hooks/use-product-detail"
 import { REVIEWS, PRICE_HISTORY, PRICE_CHART_CONFIG } from "../constants"
-import { EmptyStatePanel } from "@platform-system/design-ui/components/empty-state-panel"
 
 export function ProductDetailScreen() {
   const params = useParams()

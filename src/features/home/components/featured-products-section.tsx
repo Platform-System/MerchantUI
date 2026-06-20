@@ -4,7 +4,7 @@ import { useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ProductCard, ProductGridSkeleton, fetchAllProducts, productQueryKeys } from "@/features/product"
 import { useQuery } from "@tanstack/react-query"
-import { cn } from "@platform-system/design-ui/lib/cn"
+import { cn } from '@platform-system/design-ui';
 
 import { SectionFooter } from "./section-header"
 

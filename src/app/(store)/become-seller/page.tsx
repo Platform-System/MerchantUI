@@ -1,9 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Button } from "@platform-system/design-ui/components/button"
-import { Input } from "@platform-system/design-ui/components/input"
-import { Textarea } from "@platform-system/design-ui/components/textarea"
+import { Button, Input, Textarea } from '@platform-system/design-ui';
 import { ShieldCheck, Rocket, Percent, CheckCircle2, Loader2 } from "lucide-react"
 import { useMutation } from "@tanstack/react-query"
 import { createStore } from "@/features/seller/queries/seller-queries"

@@ -2,8 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Button } from "@platform-system/design-ui/components/button"
-import { Input } from "@platform-system/design-ui/components/input"
+import { Button, DatePicker, ImageCropper, Input, ProfileHeader, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, cn } from '@platform-system/design-ui';
 import { Settings, Key } from "lucide-react"
 import { Link } from "@/i18n/navigation"
 import { useAccount } from "../hooks/use-account"
@@ -11,18 +10,6 @@ import { ENV } from "@/shared/config/env"
 import { toast } from "sonner"
 import { apiClient } from "@/shared/api/api-client"
 import { Result } from "@/types/api"
-import { ImageCropper } from "@platform-system/design-ui/components/image-cropper"
-import { ProfileHeader } from "@platform-system/design-ui/components/profile-header"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@platform-system/design-ui/components/select"
-import { Textarea } from "@platform-system/design-ui/components/textarea"
-import { DatePicker } from "@platform-system/design-ui/components/date-picker"
-import { cn } from "@platform-system/design-ui/lib/cn"
 
 function dataURLtoFile(dataurl: string, filename: string): File {
   const arr = dataurl.split(",")
