@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Link } from "@/i18n/navigation"
 import { usePathname, useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Avatar, AvatarFallback, AvatarImage, Badge, Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, cn } from '@platform-system/design-ui';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Avatar, AvatarFallback, AvatarImage, Badge, Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, cn, UserProfileCard, HeaderLayout, UserProfileDropdown } from '@platform-system/design-ui';
 import {
   Search,
   ShoppingBag,
@@ -19,6 +19,8 @@ import {
   Wallet,
   Store,
   ArrowRight,
+  Globe,
+  Shield,
 } from "lucide-react"
 import { useAuth } from "@/core/providers/AuthProvider"
 import { SearchModal } from "@/features/search/components/search-modal"
@@ -30,6 +32,11 @@ import { fetchMyWallet } from "@/features/store/queries/wallet-queries"
 import { apiClient } from "@/shared/api/apiClient"
 import { Result } from "@/types/api"
 
+const portals = [
+  { id: 'customer', name: 'Cổng khách hàng', url: 'https://nyxoris.com', icon: <Globe size={16} />, active: true },
+  { id: 'merchant', name: 'Cổng người bán', url: 'https://merchant.nyxoris.com', icon: <ShoppingBag size={16} />, active: true },
+  { id: 'admin', name: 'Cổng quản trị', url: 'https://admin.nyxoris.com', icon: <Shield size={16} />, active: true },
+];
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -113,13 +120,18 @@ export function Header() {
     const container = document.getElementById("store-scroll-container")
     const handleScroll = () => {
       const scrollTop = container ? container.scrollTop : window.scrollY
-      setIsScrolled(scrollTop > 20)
+      setIsScrolled((prev) => {
+        if (prev) {
+          return scrollTop > 15;
+        }
+        return scrollTop > 35;
+      });
     }
 
     if (container) {
-      container.addEventListener("scroll", handleScroll)
+      container.addEventListener("scroll", handleScroll, { passive: true })
     } else {
-      window.addEventListener("scroll", handleScroll)
+      window.addEventListener("scroll", handleScroll, { passive: true })
     }
 
     return () => {
@@ -139,245 +151,239 @@ export function Header() {
 
   return (
     <>
-      <motion.header
+    <HeaderLayout
         id="store-header"
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className={cn(
-          "sticky top-0 left-0 right-0 z-[1002] transition-all duration-500",
-          isScrolled
-            ? "border-b border-[rgb(var(--store-border-rgb)/0.8)] dark:border-b-transparent bg-[rgb(var(--store-surface-strong-rgb)/0.88)] shadow-[0_14px_32px_rgb(var(--store-accent-rgb)/0.1)] backdrop-blur-xl"
-            : "border-b border-transparent dark:border-b-transparent bg-[rgb(var(--store-surface-rgb)/0.8)] backdrop-blur-sm"
-        )}
-      >
-        <div className="w-full px-4">
-          <div className={cn(
-            "flex items-center justify-between transition-all duration-500",
-            isScrolled ? "h-14" : "h-16"
-          )}>
-            {/* Nhãn store */}
-            <Link href="/home" className="flex items-center group">
-              <span className="font-sans text-xl font-black tracking-tighter text-foreground transition-all duration-300 group-hover:store-accent-text">
-                Nyxoris
-              </span>
-              <div className="h-4 w-px bg-border mx-6 hidden sm:block opacity-30" />
+        className="z-[1002]"
+        isScrolled={isScrolled}
+        logo={
+          <Link href="/home" className="flex items-center group">
+            <span className="font-sans text-xl font-black tracking-tighter text-foreground transition-all duration-300 group-hover:store-accent-text">
+              Nyxoris
+            </span>
+            <div className="h-4 w-px bg-border mx-6 hidden sm:block opacity-30" />
+          </Link>
+        }
+        centerContent={
+          <nav className="hidden lg:flex items-center gap-8">
+            <Link
+              href="/marketplace"
+              className={cn(
+                "text-sm font-medium transition-colors",
+                isActive("/marketplace") ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Cửa hàng
             </Link>
 
-            {/* Điều hướng desktop */}
-            <nav className="hidden lg:flex items-center gap-8">
-              <Link
-                href="/marketplace"
-                className={cn(
-                  "text-sm font-medium transition-colors",
-                  isActive("/marketplace") ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                )}
+            <DropdownMenu open={isCategoryOpen} onOpenChange={setIsCategoryOpen}>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none cursor-pointer">
+                  Danh mục <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isCategoryOpen && "rotate-180")} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="center"
+                className="w-48 p-1.5 ds-glass-card border-[rgb(var(--store-border-rgb)/0.7)] bg-[rgb(var(--store-surface-rgb)/0.8)] backdrop-blur-md"
               >
-                Cửa hàng
-              </Link>
+                {categories.map((category) => (
+                  <DropdownMenuItem key={category.id} asChild>
+                    <Link
+                      href={`/marketplace?category=${category.slug}`}
+                      onClick={() => setIsCategoryOpen(false)}
+                      className="store-muted-text block w-full rounded-lg px-3 py-2 text-sm transition-colors hover:bg-[rgb(var(--store-accent-rgb)/0.1)] hover:text-foreground cursor-pointer focus:bg-[rgb(var(--store-accent-rgb)/0.1)] focus:text-foreground"
+                    >
+                      {category.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-              <DropdownMenu open={isCategoryOpen} onOpenChange={setIsCategoryOpen}>
-                <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none cursor-pointer">
-                    Danh mục <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isCategoryOpen && "rotate-180")} />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="center"
-                  className="w-48 p-1.5 ds-glass-card border-[rgb(var(--store-border-rgb)/0.7)] bg-[rgb(var(--store-surface-rgb)/0.8)] backdrop-blur-md"
-                >
-                  {categories.map((category) => (
-                    <DropdownMenuItem key={category.id} asChild>
-                      <Link
-                        href={`/marketplace?category=${category.slug}`}
-                        onClick={() => setIsCategoryOpen(false)}
-                        className="store-muted-text block w-full rounded-lg px-3 py-2 text-sm transition-colors hover:bg-[rgb(var(--store-accent-rgb)/0.1)] hover:text-foreground cursor-pointer focus:bg-[rgb(var(--store-accent-rgb)/0.1)] focus:text-foreground"
-                      >
-                        {category.name}
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <Link
+              href="/sellers"
+              className={cn(
+                "text-sm font-medium transition-colors",
+                isActive("/sellers") ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Nhà bán hàng
+            </Link>
+            <Link
+              href="/become-seller"
+              className={cn(
+                "text-sm font-medium transition-colors",
+                isActive("/become-seller") ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Mở gian hàng
+            </Link>
+          </nav>
+        }
+        rightActions={
+          <>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden sm:flex shrink-0"
+              onClick={() => setIsSearchOpen(true)}
+            >
+              <Search className="h-5 w-5 shrink-0" />
+              <span className="sr-only">Tìm kiếm</span>
+            </Button>
 
-              <Link
-                href="/sellers"
-                className={cn(
-                  "text-sm font-medium transition-colors",
-                  isActive("/sellers") ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                )}
+            <Link
+              href="/wishlist"
+              className="relative hidden sm:inline-flex items-center justify-center size-9 rounded-md text-foreground hover:bg-[rgb(var(--store-accent-rgb)/0.1)] hover:text-foreground transition-colors shrink-0"
+            >
+              <Heart className="h-5 w-5 shrink-0" />
+              {wishlistCount > 0 && (
+                <Badge variant="counter" className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border-none p-0 text-[9px] font-semibold shadow-sm">
+                  {wishlistCount}
+                </Badge>
+              )}
+              <span className="sr-only">Danh sách yêu thích</span>
+            </Link>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative text-foreground hover:store-accent-text shrink-0"
+              onClick={() => setIsCartOpen(true)}
+            >
+              <motion.div
+                key={cartCount}
+                animate={cartCount > 0 ? { scale: [1, 1.2, 1] } : {}}
+                transition={{ duration: 0.4, ease: "backOut" }}
+                className="shrink-0"
               >
-                Nhà bán hàng
-              </Link>
-              <Link
-                href="/become-seller"
-                className={cn(
-                  "text-sm font-medium transition-colors",
-                  isActive("/become-seller") ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                Mở gian hàng
-              </Link>
-
-            </nav>
-
-            {/* Nhóm hành động */}
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hidden sm:flex shrink-0"
-                onClick={() => setIsSearchOpen(true)}
-              >
-                <Search className="h-5 w-5 shrink-0" />
-                <span className="sr-only">Tìm kiếm</span>
-              </Button>
-
-              <Link
-                href="/wishlist"
-                className="relative hidden sm:inline-flex items-center justify-center size-9 rounded-md text-foreground hover:bg-[rgb(var(--store-accent-rgb)/0.1)] hover:text-foreground transition-colors shrink-0"
-              >
-                <Heart className="h-5 w-5 shrink-0" />
-                {wishlistCount > 0 && (
-                  <Badge variant="counter" className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border-none p-0 text-[9px] font-semibold shadow-sm">
-                    {wishlistCount}
+                <ShoppingBag className="h-5 w-5 shrink-0" />
+                {cartCount > 0 && (
+                  <Badge variant="counter" className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-none p-0 text-[10px] font-semibold shadow-sm">
+                    {cartCount}
                   </Badge>
                 )}
-                <span className="sr-only">Danh sách yêu thích</span>
-              </Link>
+              </motion.div>
+              <span className="sr-only">Giỏ hàng</span>
+            </Button>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative text-foreground hover:store-accent-text shrink-0"
-                onClick={() => setIsCartOpen(true)}
+            {/* Avatar / Close cart button */}
+            {isCartOpen ? (
+              <motion.div
+                initial={{ scale: 0, rotate: -90, opacity: 0 }}
+                animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                exit={{ scale: 0, rotate: 90, opacity: 0 }}
+                transition={{ type: "spring", bounce: 0.4, duration: 0.35 }}
+                className="shrink-0"
               >
-                <motion.div
-                  key={cartCount}
-                  animate={cartCount > 0 ? { scale: [1, 1.2, 1] } : {}}
-                  transition={{ duration: 0.4, ease: "backOut" }}
-                  className="shrink-0"
+                <Button
+                  variant="ghost"
+                  size="icon-lg"
+                  onClick={() => setIsCartOpen(false)}
+                  className="relative rounded-full ml-1 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 shrink-0"
                 >
-                  <ShoppingBag className="h-5 w-5 shrink-0" />
-                  {cartCount > 0 && (
-                    <Badge variant="counter" className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-none p-0 text-[10px] font-semibold shadow-sm">
-                      {cartCount}
-                    </Badge>
-                  )}
-                </motion.div>
-                <span className="sr-only">Giỏ hàng</span>
-              </Button>
-
-              {/* Avatar / Close cart button */}
-              {isCartOpen ? (
-                <motion.div
-                  initial={{ scale: 0, rotate: -90, opacity: 0 }}
-                  animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                  exit={{ scale: 0, rotate: 90, opacity: 0 }}
-                  transition={{ type: "spring", bounce: 0.4, duration: 0.35 }}
-                  className="shrink-0"
-                >
-                  <Button
-                    variant="ghost"
-                    size="icon-lg"
-                    onClick={() => setIsCartOpen(false)}
-                    className="relative rounded-full ml-1 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 shrink-0"
-                  >
-                    <Avatar className="size-9 shrink-0">
-                      <AvatarFallback className="bg-foreground text-background shrink-0">
-                        <X className="size-5 shrink-0" />
+                  <Avatar className="size-9 shrink-0">
+                    <AvatarFallback className="bg-foreground text-background shrink-0">
+                      <X className="size-5 shrink-0" />
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </motion.div>
+            ) : isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon-lg" className="relative rounded-full ml-1 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 shrink-0">
+                    <Avatar className="size-9 transition-transform hover:scale-110 active:scale-95 shrink-0" showDropdownIndicator>
+                      <AvatarImage src={profile?.avatarUrl || ""} alt="User" className="object-cover shrink-0" />
+                      <AvatarFallback className="shrink-0">
+                        <User className="size-5 shrink-0" />
                       </AvatarFallback>
                     </Avatar>
                   </Button>
-                </motion.div>
-              ) : isAuthenticated ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon-lg" className="relative rounded-full ml-1 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 shrink-0">
-                      <Avatar className="size-9 transition-transform hover:scale-110 active:scale-95 shrink-0" showDropdownIndicator>
-                        <AvatarImage src={profile?.avatarUrl || ""} alt="User" className="object-cover shrink-0" />
-                        <AvatarFallback className="shrink-0">
-                          <User className="size-5 shrink-0" />
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" alignOffset={5} forceMount>
-                    <DropdownMenuItem asChild className="cursor-pointer font-normal p-2.5 min-w-0 focus:bg-[rgb(var(--store-accent-rgb)/0.05)] focus:text-foreground">
-                      <Link href="/profile" className="flex items-center gap-3 w-full min-w-0">
-                        <Avatar className="size-10 shrink-0 ring-2 ring-[rgb(var(--store-accent-rgb)/0.3)] ring-offset-1 ring-offset-background">
-                          <AvatarImage src={profile?.avatarUrl || ""} alt="User" className="object-cover" />
-                          <AvatarFallback>
-                            <User className="size-5" />
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-sm font-semibold text-foreground truncate" title={profile?.displayName || keycloak?.idTokenParsed?.preferred_username || "Người dùng"}>
-                            {profile?.displayName || keycloak?.idTokenParsed?.preferred_username || "Người dùng"}
-                          </span>
-                          <span className="text-xs text-muted-foreground mt-0.5">
-                            Gói: Miễn phí
-                          </span>
-                        </div>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground/60 shrink-0 ml-auto" />
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href="/space?tab=store" className="cursor-pointer">
-                        <Store className="mr-2 h-4 w-4" />
-                        <span>Gian hàng</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/space?tab=orders" className="cursor-pointer">
-                        <ShoppingBag className="mr-2 h-4 w-4" />
-                        <span>Đơn hàng</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/space?tab=wallet" className="cursor-pointer">
-                        <Wallet className="mr-2 h-4 w-4" />
-                        <span className="flex items-center justify-between w-full gap-2">
-                          <span>Ví</span>
-                          <span className="text-[10px] font-bold bg-[rgb(var(--store-accent-rgb)/0.1)] px-1.5 py-0.5 rounded store-accent-text shrink-0">
-                            {wallet ? `${wallet.balance.toLocaleString("vi-VN")} đ` : "--"}
-                          </span>
-                        </span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive cursor-pointer">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Đăng xuất</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={login} 
-                  className="hidden sm:flex items-center gap-2 ml-2 text-foreground hover:store-accent-text font-medium shrink-0"
-                >
-                  <LogIn className="h-4 w-4 shrink-0" />
-                  <span>Đăng nhập</span>
-                </Button>
-              )}
-
-              {/* Nút mở menu mobile */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="lg:hidden shrink-0"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" alignOffset={5} forceMount>
+                  <UserProfileDropdown
+                    userCard={
+                      <DropdownMenuItem asChild className="cursor-pointer font-normal p-2.5 min-w-0 focus:bg-[rgb(var(--store-accent-rgb)/0.05)] focus:text-foreground w-full">
+                        <a href="https://account.nyxoris.com" className="w-full">
+                          <UserProfileCard
+                            name={profile?.displayName || keycloak?.idTokenParsed?.preferred_username || "Người dùng"}
+                            avatarSrc={profile?.avatarUrl || ""}
+                            subtext="Gói: Miễn phí"
+                            showChevron={true}
+                          />
+                        </a>
+                      </DropdownMenuItem>
+                    }
+                    menuItems={
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link href="/space?tab=store" className="cursor-pointer">
+                            <Store className="mr-2 h-4 w-4 shrink-0" />
+                            <span>Gian hàng</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href="/space?tab=orders" className="cursor-pointer">
+                            <ShoppingBag className="mr-2 h-4 w-4 shrink-0" />
+                            <span>Đơn hàng</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <a href="https://account.nyxoris.com/wallet" className="cursor-pointer flex items-center w-full">
+                            <Wallet className="mr-2 h-4 w-4 shrink-0" />
+                            <span className="flex items-center justify-between w-full gap-2 min-w-0">
+                              <span className="truncate font-normal">Ví</span>
+                              <span className="text-[10px] font-bold bg-[rgb(var(--store-accent-rgb)/0.1)] px-1.5 py-0.5 rounded store-accent-text shrink-0">
+                                {wallet ? `${wallet.balance.toLocaleString("vi-VN")} đ` : "--"}
+                              </span>
+                            </span>
+                          </a>
+                        </DropdownMenuItem>
+                      </>
+                    }
+                    portals={portals.map((portal) => ({
+                      id: portal.id,
+                      name: portal.name,
+                      icon: portal.icon,
+                      href: portal.url,
+                      active: portal.active,
+                      target: portal.active ? '_blank' : undefined,
+                      rel: portal.active ? 'noreferrer' : undefined,
+                    }))}
+                    currentPortalId="merchant"
+                    logoutItem={
+                      <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive cursor-pointer">
+                        <LogOut className="mr-2 h-4 w-4 shrink-0" />
+                        <span>Đăng xuất</span>
+                      </DropdownMenuItem>
+                    }
+                  />
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={login} 
+                className="hidden sm:flex items-center gap-2 ml-2 text-foreground hover:store-accent-text font-medium shrink-0"
               >
-                {isMobileMenuOpen ? <X className="h-5 w-5 shrink-0" /> : <Menu className="h-5 w-5 shrink-0" />}
+                <LogIn className="h-4 w-4 shrink-0" />
+                <span>Đăng nhập</span>
               </Button>
-            </div>
-          </div>
-        </div>
+            )}
 
+            {/* Nút mở menu mobile */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden shrink-0"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="h-5 w-5 shrink-0" /> : <Menu className="h-5 w-5 shrink-0" />}
+            </Button>
+          </>
+        }
+      >
         {/* Menu mobile */}
         <AnimatePresence>
           {isMobileMenuOpen && (
@@ -394,49 +400,42 @@ export function Header() {
                     e.preventDefault()
                     const searchVal = mobileSearchQuery.trim()
                     if (searchVal) {
-                      setIsMobileMenuOpen(false)
                       router.push(`/marketplace?search=${encodeURIComponent(searchVal)}`)
+                      setIsMobileMenuOpen(false)
                     }
                   }}
-                  className="relative w-full"
+                  className="relative"
                 >
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <input
                     type="text"
+                    placeholder="Tìm kiếm sản phẩm..."
                     value={mobileSearchQuery}
                     onChange={(e) => setMobileSearchQuery(e.target.value)}
-                    placeholder="Tìm sản phẩm..."
-                    className="h-10 w-full rounded-lg border border-border bg-[rgb(var(--store-surface-rgb)/0.84)] pl-10 pr-10 text-sm text-foreground outline-none focus:border-foreground"
+                    className="w-full bg-[rgb(var(--store-surface-rgb)/0.5)] border border-border rounded-lg py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-primary text-foreground"
                   />
-                  {mobileSearchQuery.trim() && (
-                    <button
-                      type="submit"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 transition-colors rounded-md hover:bg-muted/50 flex items-center justify-center"
-                    >
-                      <ArrowRight className="h-4 w-4" />
-                    </button>
-                  )}
+                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 </form>
 
-                <nav className="space-y-2">
+                <nav className="flex flex-col space-y-2">
                   <Link
                     href="/marketplace"
-                    className="block px-4 py-3 rounded-lg hover:bg-muted transition-colors font-medium"
+                    className="block px-4 py-3 rounded-lg hover:bg-muted transition-colors font-medium text-sm"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Cửa hàng
                   </Link>
+
                   <Accordion type="single" collapsible className="w-full">
                     <AccordionItem value="categories" className="border-none">
-                      <AccordionTrigger className="flex items-center justify-between rounded-xl px-4 py-2 text-sm font-medium text-foreground hover:bg-[rgb(var(--store-accent-rgb)/0.1)] hover:no-underline">
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-lg transition-colors font-medium text-sm hover:no-underline">
                         Danh mục
                       </AccordionTrigger>
-                      <AccordionContent className="pt-1 pb-2 px-4 space-y-1">
+                      <AccordionContent className="pb-0 pl-4 pt-1 flex flex-col space-y-1">
                         {categories.map((category) => (
                           <Link
                             key={category.id}
                             href={`/marketplace?category=${category.slug}`}
-                            className="store-muted-text block rounded-xl px-4 py-2 text-sm transition-colors hover:bg-[rgb(var(--store-accent-rgb)/0.1)] hover:text-foreground"
+                            className="block px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                             onClick={() => setIsMobileMenuOpen(false)}
                           >
                             {category.name}
@@ -445,6 +444,7 @@ export function Header() {
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
+
                   <Link
                     href="/sellers"
                     className="block px-4 py-3 rounded-lg hover:bg-muted transition-colors font-medium text-sm"
@@ -453,33 +453,24 @@ export function Header() {
                     Nhà bán hàng
                   </Link>
                   <Link
-                    href="/wishlist"
-                    className="block px-4 py-3 rounded-lg hover:bg-muted transition-colors font-medium flex items-center justify-between text-sm"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Yêu thích
-                    {wishlistCount > 0 && (
-                      <span className="store-accent-soft flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold">
-                        {wishlistCount}
-                      </span>
-                    )}
-                  </Link>
-                  <Link
                     href="/become-seller"
                     className="block px-4 py-3 rounded-lg hover:bg-muted transition-colors font-medium text-sm"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Mở gian hàng
                   </Link>
+
+                  <div className="h-px bg-border my-2" />
+
                   {isAuthenticated ? (
                     <>
-                      <Link
-                        href="/profile"
+                      <a
+                        href="https://account.nyxoris.com"
                         className="block px-4 py-3 rounded-lg hover:bg-muted transition-colors font-medium text-sm"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         Hồ sơ cá nhân
-                      </Link>
+                      </a>
                       <Link
                         href="/space"
                         className="block px-4 py-3 rounded-lg hover:bg-muted transition-colors font-medium text-sm"
@@ -514,7 +505,7 @@ export function Header() {
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.header>
+      </HeaderLayout>
 
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
