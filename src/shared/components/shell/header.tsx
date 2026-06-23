@@ -304,9 +304,9 @@ export function Header() {
                   <UserProfileDropdown
                     userCard={
                       <DropdownMenuItem asChild className="cursor-pointer font-normal p-2.5 min-w-0 focus:bg-[rgb(var(--store-accent-rgb)/0.05)] focus:text-foreground w-full">
-                        <a href="https://account.nyxoris.com" className="w-full">
+                        <a href="https://account.nyxoris.com" target="_blank" rel="noreferrer" className="w-full">
                           <UserProfileCard
-                            name={profile?.displayName || keycloak?.idTokenParsed?.preferred_username || "Người dùng"}
+                            name={profile?.displayName || (keycloak?.idTokenParsed?.preferred_username as string) || (keycloak?.idTokenParsed?.name as string) || "Người dùng"}
                             avatarSrc={profile?.avatarUrl || ""}
                             subtext="Gói: Miễn phí"
                             showChevron={true}
