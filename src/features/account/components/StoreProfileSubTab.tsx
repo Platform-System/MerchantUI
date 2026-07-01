@@ -43,11 +43,11 @@ export interface StoreProfileSubTabProps {
     responseTime: boolean
     description: boolean
   }>>
-  nameRef: React.RefObject<HTMLInputElement>
-  taglineRef: React.RefObject<HTMLInputElement>
-  locationRef: React.RefObject<HTMLInputElement>
-  responseTimeRef: React.RefObject<HTMLInputElement>
-  descriptionRef: React.RefObject<HTMLTextAreaElement>
+  nameRef: React.RefObject<HTMLInputElement | null>
+  taglineRef: React.RefObject<HTMLInputElement | null>
+  locationRef: React.RefObject<HTMLInputElement | null>
+  responseTimeRef: React.RefObject<HTMLInputElement | null>
+  descriptionRef: React.RefObject<HTMLTextAreaElement | null>
   handleSaveProfile: () => void
   ts: (key: string) => string
 }

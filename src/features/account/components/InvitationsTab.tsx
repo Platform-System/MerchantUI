@@ -5,12 +5,12 @@ import { Mail, Check, Loader2 } from "lucide-react"
 import { Button, Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "@platform-system/design-ui"
 
 export interface InvitationsTabProps {
-  invitations: import("../queries/store-manage-queries").StoreInvitationResponse[]
+  invitations: import("../../store/queries/store-manage-queries").StoreInvitationResponse[]
   isLoadingInvitations: boolean
   isAcceptingInvitation: boolean
   acceptInvitation: (storeId: string) => void
   getMemberRoleLabel: (role: string) => string
-  ts: (key: string, values?: Record<string, unknown>) => string
+  ts: (key: string, values?: any) => string
 }
 
 export function InvitationsTab({

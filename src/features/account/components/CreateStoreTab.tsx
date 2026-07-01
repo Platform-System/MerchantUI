@@ -30,7 +30,7 @@ export interface CreateStoreTabProps {
   createStoreMutation: any
   handleCreateStoreSubmit: (e: React.FormEvent) => void
   setActiveTab: (tab: string) => void
-  tBecome: (key: string, values?: Record<string, unknown>) => string
+  tBecome: (key: string, values?: any) => string
 
   // Setup props for Draft/PendingActive stores
   normalizedStatus: string
@@ -39,7 +39,7 @@ export interface CreateStoreTabProps {
   latestRejectionReason: string | null
   storeStatusLabel: string
   storeStatusHint: string
-  ts: (key: string, values?: Record<string, unknown>) => string
+  ts: (key: string, values?: any) => string
 
   // Profile Props
   profileForm: {
@@ -78,8 +78,20 @@ export interface CreateStoreTabProps {
   isUploadingCover: boolean
   setIsCoverModalOpen: (open: boolean) => void
   setIsAvatarModalOpen: (open: boolean) => void
-  profileErrors: Record<string, string>
-  setProfileErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>
+  profileErrors: {
+    name: boolean
+    tagline: boolean
+    location: boolean
+    responseTime: boolean
+    description: boolean
+  }
+  setProfileErrors: React.Dispatch<React.SetStateAction<{
+    name: boolean
+    tagline: boolean
+    location: boolean
+    responseTime: boolean
+    description: boolean
+  }>>
   nameRef: React.RefObject<HTMLInputElement | null>
   taglineRef: React.RefObject<HTMLInputElement | null>
   locationRef: React.RefObject<HTMLInputElement | null>
@@ -103,12 +115,20 @@ export interface CreateStoreTabProps {
   hasPendingPolicyUpdate: boolean
   canRequestActivation: boolean
   isRequestingActivation: boolean
-  policyErrors: Record<string, string>
-  setPolicyErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>
+  policyErrors: {
+    shippingPolicy: boolean
+    returnPolicy: boolean
+    warrantyPolicy: boolean
+  }
+  setPolicyErrors: React.Dispatch<React.SetStateAction<{
+    shippingPolicy: boolean
+    returnPolicy: boolean
+    warrantyPolicy: boolean
+  }>>
   shippingPolicyRef: React.RefObject<HTMLTextAreaElement | null>
   returnPolicyRef: React.RefObject<HTMLTextAreaElement | null>
   warrantyPolicyRef: React.RefObject<HTMLTextAreaElement | null>
-  handlePolicyKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void
+  handlePolicyKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>, fieldName: "shippingPolicy" | "returnPolicy" | "warrantyPolicy") => void
   handleSavePolicy: () => void
   handleRequestActivation: () => void
 }
@@ -164,8 +184,7 @@ export function CreateStoreTab({
   canRequestActivation,
   isRequestingActivation,
   policyErrors,
-  setProfileErrors: _setProfileErrors, // unused, keep to prevent warning
-  policyErrors: _policyErrors, // unused, keep to prevent warning
+  setPolicyErrors,
   shippingPolicyRef,
   returnPolicyRef,
   warrantyPolicyRef,
@@ -179,7 +198,7 @@ export function CreateStoreTab({
   // Filter draft/pendingactive stores
   const draftStores = React.useMemo(() => {
     return myStores.filter(s => {
-      const status = s.profile?.status?.toLowerCase() || s.status?.toLowerCase() || ""
+      const status = s.status?.toLowerCase() || ""
       return status === "draft" || status === "pendingactive"
     })
   }, [myStores])
@@ -423,8 +442,8 @@ export function CreateStoreTab({
           hasPendingPolicyUpdate={hasPendingPolicyUpdate}
           canRequestActivation={canRequestActivation}
           isRequestingActivation={isRequestingActivation}
-          policyErrors={profileErrors} // Pass dummy policyErrors or use profileErrors if shared
-          setPolicyErrors={setProfileErrors}
+          policyErrors={policyErrors}
+          setPolicyErrors={setPolicyErrors}
           shippingPolicyRef={shippingPolicyRef}
           returnPolicyRef={returnPolicyRef}
           warrantyPolicyRef={warrantyPolicyRef}

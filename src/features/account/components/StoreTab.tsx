@@ -22,7 +22,7 @@ export interface StoreTabProps {
   storeStatusLabel: string
   storeStatusHint: string
   setActiveTab: (tab: string) => void
-  ts: (key: string, values?: Record<string, unknown>) => string
+  ts: (key: string, values?: any) => string
 
   // Profile Props
   profileForm: {
@@ -61,8 +61,20 @@ export interface StoreTabProps {
   isUploadingCover: boolean
   setIsCoverModalOpen: (open: boolean) => void
   setIsAvatarModalOpen: (open: boolean) => void
-  profileErrors: Record<string, string>
-  setProfileErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>
+  profileErrors: {
+    name: boolean
+    tagline: boolean
+    location: boolean
+    responseTime: boolean
+    description: boolean
+  }
+  setProfileErrors: React.Dispatch<React.SetStateAction<{
+    name: boolean
+    tagline: boolean
+    location: boolean
+    responseTime: boolean
+    description: boolean
+  }>>
   nameRef: React.RefObject<HTMLInputElement | null>
   taglineRef: React.RefObject<HTMLInputElement | null>
   locationRef: React.RefObject<HTMLInputElement | null>
@@ -86,12 +98,20 @@ export interface StoreTabProps {
   hasPendingPolicyUpdate: boolean
   canRequestActivation: boolean
   isRequestingActivation: boolean
-  policyErrors: Record<string, string>
-  setPolicyErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>
+  policyErrors: {
+    shippingPolicy: boolean
+    returnPolicy: boolean
+    warrantyPolicy: boolean
+  }
+  setPolicyErrors: React.Dispatch<React.SetStateAction<{
+    shippingPolicy: boolean
+    returnPolicy: boolean
+    warrantyPolicy: boolean
+  }>>
   shippingPolicyRef: React.RefObject<HTMLTextAreaElement | null>
   returnPolicyRef: React.RefObject<HTMLTextAreaElement | null>
   warrantyPolicyRef: React.RefObject<HTMLTextAreaElement | null>
-  handlePolicyKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void
+  handlePolicyKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>, fieldName: "shippingPolicy" | "returnPolicy" | "warrantyPolicy") => void
   handleSavePolicy: () => void
   handleRequestActivation: () => void
 
@@ -108,7 +128,7 @@ export interface StoreTabProps {
   }>>
   inviteMember: () => void
   isInvitingMember: boolean
-  members: import("../queries/store-manage-queries").StoreMemberResponse[]
+  members: import("../../store/queries/store-manage-queries").StoreMemberResponse[]
   isLoadingMembers: boolean
   getMemberRoleLabel: (role: string) => string
   getMemberStatusLabel: (status: string) => string
@@ -117,6 +137,7 @@ export interface StoreTabProps {
 
   // Products Props
   productForm: {
+    id: string
     title: string
     author: string
     price: string
@@ -124,6 +145,7 @@ export interface StoreTabProps {
     categoryId: string
   }
   setProductForm: React.Dispatch<React.SetStateAction<{
+    id: string
     title: string
     author: string
     price: string
@@ -236,7 +258,7 @@ export function StoreTab({
   // Filter active/suspended stores
   const activeStores = React.useMemo(() => {
     return myStores.filter(s => {
-      const status = s.profile?.status?.toLowerCase() || s.status?.toLowerCase() || ""
+      const status = s.status?.toLowerCase() || ""
       return status === "active" || status === "suspended"
     })
   }, [myStores])

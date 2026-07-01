@@ -575,7 +575,7 @@ export function AccountScreen() {
                   {activeTab === "store" && (
                     <StoreTab
                       hasStore={hasStore}
-                      myStore={myStore}
+                      myStore={myStore || null}
                       myStores={myStores}
                       selectedStoreId={selectedStoreId}
                       setSelectedStoreId={setSelectedStoreId}
@@ -662,7 +662,7 @@ export function AccountScreen() {
                   {activeTab === "create-store" && (
                     <CreateStoreTab
                       hasStore={hasStore}
-                      myStore={myStore}
+                      myStore={myStore || null}
                       myStores={myStores}
                       selectedStoreId={selectedStoreId}
                       setSelectedStoreId={setSelectedStoreId}

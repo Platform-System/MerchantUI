@@ -63,23 +63,23 @@ export function useStoreManagement() {
   // 3. Sub-hooks delegation
   const profileProps = useStoreProfile({
     selectedStoreId,
-    myStore,
+    myStore: myStore || null,
     isActiveStore,
-    pendingProfileUpdate,
+    pendingProfileUpdate: pendingProfileUpdate ?? null,
     refreshStore,
   })
 
   const policyProps = useStorePolicies({
     selectedStoreId,
-    myStore,
+    myStore: myStore || null,
     isActiveStore,
-    pendingPolicyUpdate,
+    pendingPolicyUpdate: pendingPolicyUpdate ?? null,
     refreshStore,
   })
 
   const membersProps = useStoreMembers({
     selectedStoreId,
-    myStore,
+    myStore: myStore || null,
     isActiveStore,
   })
 

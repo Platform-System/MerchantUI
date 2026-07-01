@@ -33,9 +33,9 @@ export interface StorePoliciesSubTabProps {
     returnPolicy: boolean
     warrantyPolicy: boolean
   }>>
-  shippingPolicyRef: React.RefObject<HTMLTextAreaElement>
-  returnPolicyRef: React.RefObject<HTMLTextAreaElement>
-  warrantyPolicyRef: React.RefObject<HTMLTextAreaElement>
+  shippingPolicyRef: React.RefObject<HTMLTextAreaElement | null>
+  returnPolicyRef: React.RefObject<HTMLTextAreaElement | null>
+  warrantyPolicyRef: React.RefObject<HTMLTextAreaElement | null>
   handlePolicyKeyDown: (
     event: React.KeyboardEvent<HTMLTextAreaElement>,
     fieldName: "shippingPolicy" | "returnPolicy" | "warrantyPolicy"

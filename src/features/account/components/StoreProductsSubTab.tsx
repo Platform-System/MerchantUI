@@ -6,6 +6,7 @@ import { Button, Input } from "@platform-system/design-ui"
 
 export interface StoreProductsSubTabProps {
   productForm: {
+    id: string
     title: string
     author: string
     price: string
@@ -13,6 +14,7 @@ export interface StoreProductsSubTabProps {
     categoryId: string
   }
   setProductForm: React.Dispatch<React.SetStateAction<{
+    id: string
     title: string
     author: string
     price: string
