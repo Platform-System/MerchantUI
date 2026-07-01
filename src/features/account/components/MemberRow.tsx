@@ -48,11 +48,7 @@ export function MemberRow({
 
   const isOwner = member.role.toLowerCase() === "owner"
 
-  const localAvatar = typeof window !== "undefined"
-    ? localStorage.getItem("user_avatar_" + member.userId)
-    : null
-
-  const avatarSrc = avatarUrl || localAvatar
+  const avatarSrc = avatarUrl || ""
 
   return (
     <tr className="hover:bg-[rgb(var(--store-border-rgb)/0.15)] transition-colors border-b border-[rgb(var(--store-border-rgb)/0.3)] last:border-none">
