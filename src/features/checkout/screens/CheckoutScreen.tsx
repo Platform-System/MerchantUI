@@ -44,7 +44,7 @@ export function CheckoutScreen() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-background pt-24 pb-16">
+      <div className="min-h-screen bg-background pt-12 pb-16">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <EmptyStatePanel
             icon={<CreditCard className="h-10 w-10" />}
@@ -67,7 +67,7 @@ export function CheckoutScreen() {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-24 pb-16">
+    <div className="min-h-screen bg-background pt-12 pb-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-10">
           <Link

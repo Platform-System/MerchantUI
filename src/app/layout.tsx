@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
-import { BRAND_METADATA, ThemeProvider, Toaster } from '@platform-system/design-ui';
+import { BRAND_METADATA, ThemeProvider, Toaster, SonnerToaster } from '@platform-system/design-ui';
 import QueryProvider from "@/core/providers/QueryProvider";
 import AuthProvider from "@/core/providers/AuthProvider";
 import { GlobalLoadingBar } from "@/shared/layout/GlobalLoadingBar";
@@ -10,6 +10,7 @@ const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700", "800"],
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default async function RootLayout({
       >
         <ThemeProvider defaultTheme="light">
           <Toaster />
+          <SonnerToaster />
           <AuthProvider>
             <QueryProvider>
               <div

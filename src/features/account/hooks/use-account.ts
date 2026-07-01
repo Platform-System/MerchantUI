@@ -1,7 +1,7 @@
 import React from "react"
 import { useQuery } from "@tanstack/react-query"
 import type { AxiosError } from "axios"
-import { useSearchParams } from "next/navigation"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { StoreOrder, StoreProfile } from "@/types/store"
 import { DEFAULT_PROFILE } from "../constants"
 import { useWishlist } from "@/features/wishlist"
@@ -125,18 +125,28 @@ async function fetchFullProfile(profile: AccountProfileResponse): Promise<Accoun
 }
 
 export function useAccount() {
+  const router = useRouter()
+  const pathname = usePathname()
   const searchParams = useSearchParams()
   const initialTab = searchParams.get("tab") || "orders"
-  const [activeTab, setActiveTab] = React.useState(initialTab)
+  const [activeTab, setActiveTabState] = React.useState(initialTab)
   const [profile, setProfile] = React.useState<StoreProfile>(DEFAULT_PROFILE)
 
   React.useEffect(() => {
     const tab = searchParams.get("tab")
-    if (tab) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setActiveTab(tab)
+    if (tab && tab !== activeTab) {
+      setActiveTabState(tab)
+    } else if (!tab && activeTab !== "orders") {
+      setActiveTabState("orders")
     }
-  }, [searchParams])
+  }, [searchParams, activeTab])
+
+  const setActiveTab = React.useCallback((tab: string) => {
+    setActiveTabState(tab)
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("tab", tab)
+    router.push(`${pathname}?${params.toString()}`)
+  }, [router, pathname, searchParams])
 
   const { data: profileData, refetch: refetchProfile } = useQuery({
     queryKey: ["account-profile"],

@@ -50,7 +50,7 @@ export function HeroSection() {
       </div>
 
       {/* Content */}
-      <motion.div style={{ y, opacity }} className="relative z-20 pt-32 pb-20">
+      <motion.div style={{ y, opacity }} className="relative z-20 pt-12 pb-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center min-h-[80vh]">
             {/* Left Content */}

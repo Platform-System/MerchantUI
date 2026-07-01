@@ -136,13 +136,13 @@ function MarketplaceScreenContent() {
 
   return (
     <div className="min-h-screen bg-background">
-      <section className="relative overflow-hidden pt-32 pb-8">
+      <section className="relative overflow-hidden pt-12 pb-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="py-12 text-center"
+            className="pb-12 pt-0 text-center"
           >
             <h1 className="mb-4 font-serif text-4xl font-semibold tracking-[0.18em] text-foreground sm:text-5xl">
               CỬA HÀNG
@@ -395,7 +395,7 @@ function MarketplaceScreenContent() {
 
 export function MarketplaceScreen() {
   return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-background pt-32 pb-8"><Spinner className="spinner-accent h-8 w-8" /></div>}>
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-background pt-12 pb-8"><Spinner className="spinner-accent h-8 w-8" /></div>}>
       <MarketplaceScreenContent />
     </Suspense>
   )

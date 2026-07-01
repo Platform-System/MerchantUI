@@ -20,7 +20,7 @@ import {
   Store,
   ArrowRight,
   Globe,
-  Shield,
+  MessageSquare,
 } from "lucide-react"
 import { useAuth } from "@/core/providers/AuthProvider"
 import { SearchModal } from "@/features/search/components/search-modal"
@@ -29,13 +29,14 @@ import { useWishlist } from "@/features/wishlist"
 import { useCategories } from "@/shared/lib/category-queries"
 import { useQuery } from "@tanstack/react-query"
 import { fetchMyWallet } from "@/features/store/queries/wallet-queries"
+import { fetchMyStores } from "@/features/store/queries/store-manage-queries"
 import { apiClient } from "@/shared/api/apiClient"
 import { Result } from "@/types/api"
 
 const portals = [
   { id: 'customer', name: 'Cổng khách hàng', url: 'https://nyxoris.com', icon: <Globe size={16} />, active: true },
   { id: 'merchant', name: 'Cổng người bán', url: 'https://merchant.nyxoris.com', icon: <ShoppingBag size={16} />, active: true },
-  { id: 'admin', name: 'Cổng quản trị', url: 'https://admin.nyxoris.com', icon: <Shield size={16} />, active: true },
+  { id: 'community', name: 'Cổng cộng đồng', url: '#', icon: <MessageSquare size={16} />, active: false },
 ];
 
 export function Header() {
@@ -100,6 +101,17 @@ export function Header() {
     enabled: isAuthenticated,
     staleTime: 30 * 1000,
   })
+
+  const { data: myStores = [] } = useQuery({
+    queryKey: ["store-manage", "my-stores"],
+    queryFn: fetchMyStores,
+    enabled: isAuthenticated,
+    staleTime: 60 * 1000,
+  })
+
+  const becomeSellerUrl = isAuthenticated && myStores.length > 0
+    ? "/space?tab=create-store"
+    : "/become-seller"
 
   const isActive = (path: string) => {
     const fullPath = pathname.startsWith("/") ? pathname : `/${pathname}`
@@ -177,7 +189,7 @@ export function Header() {
 
             <DropdownMenu open={isCategoryOpen} onOpenChange={setIsCategoryOpen}>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:outline-none cursor-pointer">
+                <button className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus:ring-0 focus-visible:ring-0 cursor-pointer">
                   Danh mục <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", isCategoryOpen && "rotate-180")} />
                 </button>
               </DropdownMenuTrigger>
@@ -209,7 +221,7 @@ export function Header() {
               Nhà bán hàng
             </Link>
             <Link
-              href="/become-seller"
+              href={becomeSellerUrl}
               className={cn(
                 "text-sm font-medium transition-colors",
                 isActive("/become-seller") ? "text-foreground" : "text-muted-foreground hover:text-foreground"
@@ -224,7 +236,7 @@ export function Header() {
             <Button
               variant="ghost"
               size="icon"
-              className="hidden sm:flex shrink-0"
+              className="hidden sm:flex shrink-0 focus:ring-0 focus-visible:ring-0"
               onClick={() => setIsSearchOpen(true)}
             >
               <Search className="h-5 w-5 shrink-0" />
@@ -233,7 +245,7 @@ export function Header() {
 
             <Link
               href="/wishlist"
-              className="relative hidden sm:inline-flex items-center justify-center size-9 rounded-md text-foreground hover:bg-[rgb(var(--store-accent-rgb)/0.1)] hover:text-foreground transition-colors shrink-0"
+              className="relative hidden sm:inline-flex items-center justify-center size-9 rounded-md text-foreground hover:bg-[rgb(var(--store-accent-rgb)/0.1)] hover:text-foreground transition-colors shrink-0 focus:ring-0 focus-visible:ring-0"
             >
               <Heart className="h-5 w-5 shrink-0" />
               {wishlistCount > 0 && (
@@ -247,7 +259,7 @@ export function Header() {
             <Button
               variant="ghost"
               size="icon"
-              className="relative text-foreground hover:store-accent-text shrink-0"
+              className="relative text-foreground hover:store-accent-text shrink-0 focus:ring-0 focus-visible:ring-0"
               onClick={() => setIsCartOpen(true)}
             >
               <motion.div
@@ -279,7 +291,7 @@ export function Header() {
                   variant="ghost"
                   size="icon-lg"
                   onClick={() => setIsCartOpen(false)}
-                  className="relative rounded-full ml-1 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 shrink-0"
+                  className="relative rounded-full ml-1 hover:bg-transparent focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 shrink-0"
                 >
                   <Avatar className="size-9 shrink-0">
                     <AvatarFallback className="bg-foreground text-background shrink-0">
@@ -291,7 +303,7 @@ export function Header() {
             ) : isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon-lg" className="relative rounded-full ml-1 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 shrink-0">
+                  <Button variant="ghost" size="icon-lg" className="relative rounded-full ml-1 hover:bg-transparent focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 shrink-0">
                     <Avatar className="size-9 transition-transform hover:scale-110 active:scale-95 shrink-0" showDropdownIndicator>
                       <AvatarImage src={profile?.avatarUrl || ""} alt="User" className="object-cover shrink-0" />
                       <AvatarFallback className="shrink-0">
@@ -329,7 +341,7 @@ export function Header() {
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <a href="https://account.nyxoris.com/wallet" className="cursor-pointer flex items-center w-full">
+                          <a href="https://account.nyxoris.com/wallet" target="_blank" rel="noopener noreferrer" className="cursor-pointer flex items-center w-full">
                             <Wallet className="mr-2 h-4 w-4 shrink-0" />
                             <span className="flex items-center justify-between w-full gap-2 min-w-0">
                               <span className="truncate font-normal">Ví</span>
@@ -365,7 +377,7 @@ export function Header() {
                 variant="ghost" 
                 size="sm" 
                 onClick={login} 
-                className="hidden sm:flex items-center gap-2 ml-2 text-foreground hover:store-accent-text font-medium shrink-0"
+                className="hidden sm:flex items-center gap-2 ml-2 text-foreground hover:store-accent-text font-medium shrink-0 focus:ring-0 focus-visible:ring-0"
               >
                 <LogIn className="h-4 w-4 shrink-0" />
                 <span>Đăng nhập</span>
@@ -376,7 +388,7 @@ export function Header() {
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden shrink-0"
+              className="lg:hidden shrink-0 focus:ring-0 focus-visible:ring-0"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <X className="h-5 w-5 shrink-0" /> : <Menu className="h-5 w-5 shrink-0" />}
@@ -427,7 +439,7 @@ export function Header() {
 
                   <Accordion type="single" collapsible className="w-full">
                     <AccordionItem value="categories" className="border-none">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-lg transition-colors font-medium text-sm hover:no-underline">
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted rounded-lg transition-colors font-medium text-sm hover:no-underline focus:ring-0 focus-visible:ring-0">
                         Danh mục
                       </AccordionTrigger>
                       <AccordionContent className="pb-0 pl-4 pt-1 flex flex-col space-y-1">
@@ -453,7 +465,7 @@ export function Header() {
                     Nhà bán hàng
                   </Link>
                   <Link
-                    href="/become-seller"
+                    href={becomeSellerUrl}
                     className="block px-4 py-3 rounded-lg hover:bg-muted transition-colors font-medium text-sm"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >

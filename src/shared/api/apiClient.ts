@@ -21,7 +21,8 @@ configurePlatformApi({
       error.config?.url?.includes('/api/wallet/me') ||
       error.config?.url?.includes('/api/identity/users/me/images/avatar') ||
       error.config?.url?.includes('/api/identity/users/me/images/cover') ||
-      error.config?.url?.includes('/api/identity/users/me/profile')
+      error.config?.url?.includes('/api/identity/users/me/profile') ||
+      error.config?.url?.includes('/api/catalog/manage/stores/me/products/pending-owner-review')
     )) {
       return;
     }

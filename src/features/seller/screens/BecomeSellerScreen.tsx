@@ -3,16 +3,41 @@
 import * as React from "react"
 import { Button, Input, Textarea } from '@platform-system/design-ui';
 import { ShieldCheck, Rocket, Percent, CheckCircle2, Loader2 } from "lucide-react"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { createStore } from "@/features/seller/queries/seller-queries"
+import { fetchMyStores } from "@/features/store/queries/store-manage-queries"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/navigation"
+import { useRouter } from "next/navigation"
 
 export function BecomeSellerScreen() {
   const t = useTranslations("BecomeSeller")
+  const router = useRouter()
   const [isSubmitted, setIsSubmitted] = React.useState(false)
   const [alreadyHasStore, setAlreadyHasStore] = React.useState(false)
+  const [showCreateForm, setShowCreateForm] = React.useState(false)
+
+  const { data: myStores = [], isLoading: isCheckingStore } = useQuery({
+    queryKey: ["my-stores-check"],
+    queryFn: fetchMyStores,
+    staleTime: 0,
+    retry: false,
+  })
+
+  React.useEffect(() => {
+    if (!isCheckingStore && myStores.length > 0) {
+      router.replace("/space?tab=create-store")
+    }
+  }, [isCheckingStore, myStores, router])
+
+  const hasDraftOrPending = React.useMemo(() => {
+    return myStores.some((s) => {
+      const status = (s.status || "").toLowerCase()
+      return status === "draft" || status === "pendingactive"
+    })
+  }, [myStores])
+
   const [formData, setFormData] = React.useState({
     name: "",
     tagline: "",
@@ -30,27 +55,35 @@ export function BecomeSellerScreen() {
         return
       }
 
-      if (result.message?.toLowerCase().includes("already belongs to a store")) {
+      const errors = (result as { errors?: string[] }).errors || []
+      const hasAlreadyBelongsError = errors.some((e) => typeof e === "string" && e.toLowerCase().includes("already belongs to a store"))
+
+      if (result.message?.toLowerCase().includes("already belongs to a store") || hasAlreadyBelongsError) {
         setAlreadyHasStore(true)
         toast.error(t("alreadyHasStoreToast"))
       } else {
-        toast.error(result.message || t("toastError"))
+        const errorMsg = result.message || errors[0] || t("toastError")
+        toast.error(errorMsg)
       }
     },
     onError: (error: unknown) => {
-      const message =
-        typeof error === "object" &&
-        error !== null &&
-        "response" in error &&
-        typeof (error as { response?: { data?: { message?: unknown } } }).response?.data?.message === "string"
-          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
-          : t("fetchError")
+      const data = typeof error === "object" && error !== null && "response" in error
+        ? (error as { response?: { data?: { errors?: string[]; message?: string } } }).response?.data
+        : null
 
-      if (typeof message === "string" && message.toLowerCase().includes("already belongs to a store")) {
+      const errors = data?.errors || []
+      const hasAlreadyBelongsError = errors.some((e) => typeof e === "string" && e.toLowerCase().includes("already belongs to a store"))
+      const responseMessage = data?.message
+
+      if (
+        (typeof responseMessage === "string" && responseMessage.toLowerCase().includes("already belongs to a store")) ||
+        hasAlreadyBelongsError
+      ) {
         setAlreadyHasStore(true)
         toast.error(t("alreadyHasStoreToast"))
       } else {
-        toast.error(message)
+        const errorMsg = responseMessage || errors[0] || (error as Error)?.message || t("fetchError")
+        toast.error(errorMsg)
       }
     }
   })
@@ -67,7 +100,7 @@ export function BecomeSellerScreen() {
   }
 
   return (
-    <div className="relative z-10 flex min-h-screen items-center bg-background pt-24 pb-12 text-foreground">
+    <div className="relative z-10 flex min-h-screen items-center bg-background pt-12 pb-12 text-foreground">
       <div className="mx-auto grid max-w-6xl grid-cols-1 items-start gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
         
         {/* Benefits */}
@@ -107,16 +140,42 @@ export function BecomeSellerScreen() {
 
         {/* Form */}
         <div className="ds-dark-panel p-8">
-          {alreadyHasStore ? (
+          {isCheckingStore ? (
+            <div className="flex h-64 items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : (myStores.length > 0 && !showCreateForm) || alreadyHasStore ? (
             <div className="text-center py-12 flex flex-col items-center gap-4">
               <CheckCircle2 className="h-16 w-16 text-foreground" />
               <h3 className="mt-2 font-serif text-2xl font-bold">{t("existingStoreTitle")}</h3>
               <p className="max-w-md text-muted-foreground">
-                {t("existingStoreDescNoName")}
+                {hasDraftOrPending
+                  ? t("hasDraftOrPendingDesc")
+                  : myStores.length === 1
+                    ? t("existingStoreDesc", { name: myStores[0].name })
+                    : `Bạn đang tham gia hoặc quản lý ${myStores.length} cửa hàng.`}
               </p>
-              <Button asChild className="store-accent-button store-accent-button-strong mt-4 rounded-xl">
-                <Link href="/space?tab=store">{t("manageStore")}</Link>
-              </Button>
+              <div className="flex gap-4">
+                <Button asChild className="store-accent-button store-accent-button-strong rounded-xl">
+                  <Link href="/space?tab=store">{t("manageStore")}</Link>
+                </Button>
+                {!alreadyHasStore && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      if (hasDraftOrPending) {
+                        toast.error(t("draftOrPendingStoreToast"))
+                      } else {
+                        setShowCreateForm(true)
+                      }
+                    }}
+                    disabled={hasDraftOrPending}
+                    className="rounded-xl"
+                  >
+                    Đăng ký thêm cửa hàng mới
+                  </Button>
+                )}
+              </div>
             </div>
           ) : isSubmitted ? (
             <div className="text-center py-12 flex flex-col items-center gap-4">

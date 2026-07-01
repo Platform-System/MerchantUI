@@ -40,7 +40,7 @@ export function OrderSuccessScreen({ order }: OrderSuccessScreenProps) {
   }, [])
 
   return (
-    <div className="min-h-screen bg-background pt-32 pb-16">
+    <div className="min-h-screen bg-background pt-12 pb-16">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}

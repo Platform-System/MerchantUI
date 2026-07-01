@@ -1,7 +1,7 @@
 @import "tailwindcss";
-@source "../../../Platform.DesignUI/src/**/*.tsx";
+@source "../../../../Platform.DesignUI/src/**/*.tsx";
+@source "../../../../node_modules/@platform-system/design-ui/src/**/*.tsx";
 @source "../../../node_modules/@platform-system/design-ui/src/**/*.tsx";
-@source "../../node_modules/@platform-system/design-ui/src/**/*.tsx";
 @import "@platform-system/design-ui/index.css";
 
 @theme {
@@ -25,4 +25,10 @@ body {
 :root {
   --scrollbar-thumb: var(--scrollbar-thumb-zinc);
   --scrollbar-thumb-hover: var(--scrollbar-thumb-zinc-hover);
+}
+
+/* Khử viền đen mặc định cứng của trình duyệt khi focus/active trên toàn bộ hệ thống */
+*:focus,
+*:focus-visible {
+  outline: none !important;
 }

@@ -1,6 +1,6 @@
 import { apiClient } from "@/shared/api/apiClient"
 import type { AxiosError } from "axios"
-import type { Result } from "@/types/api"
+import type { Result, PagedResult } from "@/types/api"
 import type { StoreDetailsResponse } from "@/shared/lib/storefront-normalizers"
 
 export interface UpdateStoreProfileRequest {
@@ -29,7 +29,7 @@ export interface SetStoreImageRequest {
   fileName: string
   contentType: string
   size: number
-  altText: string
+  altText?: string
   url: string
 }
 
@@ -46,18 +46,41 @@ export interface StoreMemberResponse {
   joinedAt: string
 }
 
+export interface StoreProfileResponse {
+  id: string
+  name: string
+  slug: string
+  description?: string
+  tagline?: string
+  location?: string
+  responseTime?: string
+  avatar?: { url: string } | null
+  cover?: { url: string } | null
+  status: string
+}
+
 export const storeManageQueryKeys = {
-  me: ["store-manage", "me"] as const,
-  meMembers: ["store-manage", "me-members"] as const,
+  myStores: ["store-manage", "my-stores"] as const,
+  store: (storeId: string) => ["store-manage", storeId] as const,
+  members: (storeId: string) => ["store-manage", storeId, "members"] as const,
+  pendingUpdate: (storeId: string) => ["store-manage", storeId, "pending-update"] as const,
 }
 
 interface StoreLookupResult extends Result<StoreDetailsResponse> {
   errors?: string[]
 }
 
-export async function fetchMyStore(): Promise<StoreDetailsResponse | null> {
+export async function fetchMyStores(): Promise<StoreProfileResponse[]> {
+  const response = await apiClient.get<Result<StoreProfileResponse[]>>("/api/store/manage/stores/my-stores")
+  if (response.data?.success && response.data.data) {
+    return response.data.data
+  }
+  return []
+}
+
+export async function fetchMyStore(storeId: string): Promise<StoreDetailsResponse | null> {
   try {
-    const response = await apiClient.get<StoreLookupResult>("/api/store/manage/stores/me", {
+    const response = await apiClient.get<StoreLookupResult>(`/api/store/manage/stores/${storeId}`, {
       validateStatus: (status) => status < 500,
     })
 
@@ -83,20 +106,20 @@ export async function fetchMyStore(): Promise<StoreDetailsResponse | null> {
   }
 }
 
-export async function updateMyStoreProfile(request: UpdateStoreProfileRequest) {
-  const response = await apiClient.put<Result<unknown>>("/api/store/manage/stores/me/profile", request)
+export async function updateMyStoreProfile(storeId: string, request: UpdateStoreProfileRequest) {
+  const response = await apiClient.put<Result<unknown>>(`/api/store/manage/stores/${storeId}/profile`, request)
   return response.data
 }
 
-export async function updateMyStorePolicy(request: UpdateStorePolicyRequest) {
-  const response = await apiClient.put<Result<unknown>>("/api/store/manage/stores/me/policy", request)
+export async function updateMyStorePolicy(storeId: string, request: UpdateStorePolicyRequest) {
+  const response = await apiClient.put<Result<unknown>>(`/api/store/manage/stores/${storeId}/policy`, request)
   return response.data
 }
 
-export async function fetchMyStoreMembers(): Promise<StoreMemberResponse[]> {
-  const response = await apiClient.get<Result<StoreMemberResponse[]>>("/api/store/manage/stores/me/members")
+export async function fetchMyStoreMembers(storeId: string): Promise<StoreMemberResponse[]> {
+  const response = await apiClient.get<Result<PagedResult<StoreMemberResponse>>>(`/api/store/manage/stores/${storeId}/members`)
   if (response.data?.success && response.data.data) {
-    return response.data.data
+    return response.data.data.items
   }
 
   return []
@@ -117,13 +140,44 @@ export async function acceptStoreInvitation(storeId: string) {
   return response.data
 }
 
-export async function setMyStoreImage(type: "avatar" | "cover", request: SetStoreImageRequest) {
-  const response = await apiClient.put<Result<unknown>>(`/api/store/manage/stores/me/images/${type}`, request)
+export interface StoreInvitationResponse {
+  storeId: string
+  storeName: string
+  role: string
+  status: string
+  invitedAt: string
+}
+
+export async function fetchMyStoreInvitations(page = 1, pageSize = 100): Promise<PagedResult<StoreInvitationResponse>> {
+  const response = await apiClient.get<Result<PagedResult<StoreInvitationResponse>>>("/api/store/manage/stores/my-invitations", {
+    params: { page, pageSize }
+  })
+  if (response.data?.success && response.data.data) {
+    return response.data.data
+  }
+  return { items: [], page, pageSize, totalCount: 0 }
+}
+
+export async function setMyStoreImage(storeId: string, type: "avatar" | "cover", request: SetStoreImageRequest) {
+  const response = await apiClient.put<Result<unknown>>(`/api/store/manage/stores/${storeId}/images/${type}`, request)
   return response.data
 }
 
-export async function updateStoreMemberPublishPermission(userId: string, request: UpdatePublishPermissionRequest) {
-  const response = await apiClient.put<Result<unknown>>(`/api/store/manage/stores/members/${userId}/publish-permission`, request)
+export async function uploadMyStoreImage(storeId: string, type: "avatar" | "cover", file: File, altText: string) {
+  const formData = new FormData()
+  formData.append("file", file)
+  formData.append("altText", altText)
+
+  const response = await apiClient.post<Result<unknown>>(`/api/store/manage/stores/${storeId}/images/${type}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  })
+  return response.data
+}
+
+export async function updateStoreMemberPublishPermission(storeId: string, userId: string, request: UpdatePublishPermissionRequest) {
+  const response = await apiClient.put<Result<unknown>>(`/api/store/manage/stores/${storeId}/members/${userId}/publish-permission`, request)
   return response.data
 }
 
@@ -148,4 +202,67 @@ export async function fetchUserProfileById(userId: string): Promise<UserProfileR
     console.error(`Loi khi lay thong tin user ${userId}:`, error)
     return null
   }
+}
+
+export interface StoreUpdateRequestResponse {
+  id: string
+  storeId: string
+  userId: string
+  status: string
+  requestType: string
+  createdAt?: string
+  updatedAt?: string
+  name?: string
+  tagline?: string
+  description?: string
+  location?: string
+  responseTime?: string
+  shippingPolicy?: string
+  returnPolicy?: string
+  warrantyPolicy?: string
+  currentName?: string
+  currentTagline?: string
+  currentDescription?: string
+  currentLocation?: string
+  currentResponseTime?: string
+  currentShippingPolicy?: string
+  currentReturnPolicy?: string
+  currentWarrantyPolicy?: string
+}
+
+export async function fetchMyPendingStoreUpdates(storeId: string): Promise<StoreUpdateRequestResponse[]> {
+  const response = await apiClient.get<Result<StoreUpdateRequestResponse[]>>(`/api/store/manage/stores/${storeId}/update-requests/pending`)
+  if (response.data?.success && response.data.data) {
+    return response.data.data
+  }
+  return []
+}
+
+export async function submitStoreProfileUpdateRequest(storeId: string, request: UpdateStoreProfileRequest) {
+  const response = await apiClient.post<Result<unknown>>(`/api/store/manage/stores/${storeId}/profile-update-requests`, request)
+  return response.data
+}
+
+export async function submitStorePolicyUpdateRequest(storeId: string, request: UpdateStorePolicyRequest) {
+  const response = await apiClient.post<Result<unknown>>(`/api/store/manage/stores/${storeId}/policy-update-requests`, request)
+  return response.data
+}
+
+export interface StoreActivationRequestResponse {
+  id: string
+  storeId: string
+  userId: string
+  status: string
+  rejectionReason?: string | null
+  processedAt?: string | null
+  processedBy?: string | null
+  createdAt: string
+}
+
+export async function fetchStoreActivationRequests(storeId: string): Promise<StoreActivationRequestResponse[]> {
+  const response = await apiClient.get<Result<StoreActivationRequestResponse[]>>(`/api/store/manage/stores/${storeId}/activation-requests`)
+  if (response.data?.success && response.data.data) {
+    return response.data.data
+  }
+  return []
 }

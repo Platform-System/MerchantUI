@@ -5,7 +5,7 @@ import { Skeleton } from '@platform-system/design-ui';
 export function ProductDetailSkeleton() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-background">
-      <div className="relative pt-32 pb-16">
+      <div className="relative pt-12 pb-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb Skeleton */}
           <div className="mb-8 flex items-center gap-4">

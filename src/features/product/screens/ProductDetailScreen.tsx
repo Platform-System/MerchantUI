@@ -68,7 +68,7 @@ export function ProductDetailScreen() {
 
   if (!baseProduct) {
     return (
-      <main className="relative min-h-screen bg-background pt-32 pb-16">
+      <main className="relative min-h-screen bg-background pt-12 pb-16">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <EmptyStatePanel
             icon={<ShoppingBag className="h-10 w-10" />}
@@ -100,7 +100,7 @@ export function ProductDetailScreen() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-background">
-      <div className="relative pt-32 pb-16">
+      <div className="relative pt-12 pb-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.nav initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-8 text-sm">
             <ol className="flex items-center gap-2 text-muted-foreground">

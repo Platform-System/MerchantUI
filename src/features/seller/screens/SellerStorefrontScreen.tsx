@@ -48,7 +48,7 @@ export function SellerStorefrontScreen() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center pt-32">
+      <div className="flex min-h-screen items-center justify-center pt-12">
         <Spinner className="spinner-accent h-8 w-8" />
       </div>
     )
@@ -56,7 +56,7 @@ export function SellerStorefrontScreen() {
 
   if (!seller) {
     return (
-      <div className="relative z-10 min-h-screen bg-background pb-28 pt-32 text-foreground">
+      <div className="relative z-10 min-h-screen bg-background pb-28 pt-12 text-foreground">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <EmptyStatePanel
             icon={<Users className="h-10 w-10" />}
@@ -79,7 +79,7 @@ export function SellerStorefrontScreen() {
   }
 
   return (
-    <div className="relative z-10 min-h-screen bg-background pb-28 pt-32 text-foreground">
+    <div className="relative z-10 min-h-screen bg-background pb-28 pt-12 text-foreground">
       <section className="relative">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <button

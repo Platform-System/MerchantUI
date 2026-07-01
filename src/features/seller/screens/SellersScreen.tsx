@@ -41,7 +41,7 @@ export function SellersScreen() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center pt-32">
+      <div className="flex min-h-screen items-center justify-center pt-12">
         <Spinner className="spinner-accent h-8 w-8" />
       </div>
     )
@@ -58,7 +58,7 @@ export function SellersScreen() {
   })
 
   return (
-    <div className="min-h-screen bg-background pt-32 pb-16">
+    <div className="min-h-screen bg-background pt-12 pb-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Hero Header */}
         <div className="text-center mb-12">
