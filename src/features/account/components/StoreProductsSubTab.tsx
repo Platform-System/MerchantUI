@@ -37,7 +37,7 @@ export interface StoreProductsSubTabProps {
   ownerReviewProducts: import("@/shared/lib/storefront-normalizers").CatalogProductResponse[]
   approveProduct: (id: string) => void
   isApprovingProduct: boolean
-  ts: (key: string, values?: Record<string, unknown>) => string
+  ts: (key: string, values?: Record<string, string | number | Date>) => string
 }
 
 export function StoreProductsSubTab({

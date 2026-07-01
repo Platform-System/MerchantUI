@@ -22,7 +22,7 @@ export interface StoreTabProps {
   storeStatusLabel: string
   storeStatusHint: string
   setActiveTab: (tab: string) => void
-  ts: (key: string, values?: any) => string
+  ts: (key: string, values?: Record<string, string | number | Date>) => string
 
   // Profile Props
   profileForm: {

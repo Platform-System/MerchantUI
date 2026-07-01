@@ -11,7 +11,7 @@ export interface OrdersTabProps {
   statusClassName: (status: StoreOrder["status"]) => string
   setSelectedOrderId: (id: string | null) => void
   t: (key: string) => string
-  tc: (key: string, values?: any) => string
+  tc: (key: string, values?: Record<string, string | number | Date>) => string
 }
 
 export function OrdersTab({

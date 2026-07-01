@@ -10,7 +10,7 @@ export interface InvitationsTabProps {
   isAcceptingInvitation: boolean
   acceptInvitation: (storeId: string) => void
   getMemberRoleLabel: (role: string) => string
-  ts: (key: string, values?: any) => string
+  ts: (key: string, values?: Record<string, string | number | Date>) => string
 }
 
 export function InvitationsTab({

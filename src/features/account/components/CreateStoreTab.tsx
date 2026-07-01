@@ -30,7 +30,7 @@ export interface CreateStoreTabProps {
   createStoreMutation: any
   handleCreateStoreSubmit: (e: React.FormEvent) => void
   setActiveTab: (tab: string) => void
-  tBecome: (key: string, values?: any) => string
+  tBecome: (key: string, values?: Record<string, string | number | Date>) => string
 
   // Setup props for Draft/PendingActive stores
   normalizedStatus: string
@@ -39,7 +39,7 @@ export interface CreateStoreTabProps {
   latestRejectionReason: string | null
   storeStatusLabel: string
   storeStatusHint: string
-  ts: (key: string, values?: any) => string
+  ts: (key: string, values?: Record<string, string | number | Date>) => string
 
   // Profile Props
   profileForm: {
