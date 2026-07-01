@@ -9,12 +9,14 @@ import {
   setMyStoreImage,
   uploadMyStoreImage,
 } from "../queries/store-manage-queries"
+import type { StoreUpdateRequestResponse } from "../queries/store-manage-queries"
+import type { StoreDetailsResponse } from "@/shared/lib/storefront-normalizers"
 
 export interface UseStoreProfileProps {
   selectedStoreId: string | null
-  myStore: any
+  myStore: StoreDetailsResponse | null
   isActiveStore: boolean
-  pendingProfileUpdate: any
+  pendingProfileUpdate: StoreUpdateRequestResponse | null
   refreshStore: () => Promise<void>
 }
 
@@ -53,27 +55,29 @@ export function useStoreProfile({
     url: "",
   })
 
-  React.useEffect(() => {
-    if (!myStore) return
+  const [prevStoreAndPending, setPrevStoreAndPending] = React.useState({ myStore, pendingProfileUpdate })
+  if (prevStoreAndPending.myStore !== myStore || prevStoreAndPending.pendingProfileUpdate !== pendingProfileUpdate) {
+    setPrevStoreAndPending({ myStore, pendingProfileUpdate })
+    if (myStore) {
+      setProfileForm({
+        name: (pendingProfileUpdate?.name !== undefined && pendingProfileUpdate?.name !== null) ? pendingProfileUpdate.name : (myStore.profile.name || ""),
+        tagline: (pendingProfileUpdate?.tagline !== undefined && pendingProfileUpdate?.tagline !== null) ? pendingProfileUpdate.tagline : (myStore.profile.tagline || ""),
+        description: (pendingProfileUpdate?.description !== undefined && pendingProfileUpdate?.description !== null) ? pendingProfileUpdate.description : (myStore.profile.description || ""),
+        location: (pendingProfileUpdate?.location !== undefined && pendingProfileUpdate?.location !== null) ? pendingProfileUpdate.location : (myStore.profile.location || ""),
+        responseTime: (pendingProfileUpdate?.responseTime !== undefined && pendingProfileUpdate?.responseTime !== null) ? pendingProfileUpdate.responseTime : (myStore.profile.responseTime || ""),
+      })
 
-    setProfileForm({
-      name: (pendingProfileUpdate?.name !== undefined && pendingProfileUpdate?.name !== null) ? pendingProfileUpdate.name : (myStore.profile.name || ""),
-      tagline: (pendingProfileUpdate?.tagline !== undefined && pendingProfileUpdate?.tagline !== null) ? pendingProfileUpdate.tagline : (myStore.profile.tagline || ""),
-      description: (pendingProfileUpdate?.description !== undefined && pendingProfileUpdate?.description !== null) ? pendingProfileUpdate.description : (myStore.profile.description || ""),
-      location: (pendingProfileUpdate?.location !== undefined && pendingProfileUpdate?.location !== null) ? pendingProfileUpdate.location : (myStore.profile.location || ""),
-      responseTime: (pendingProfileUpdate?.responseTime !== undefined && pendingProfileUpdate?.responseTime !== null) ? pendingProfileUpdate.responseTime : (myStore.profile.responseTime || ""),
-    })
+      setAvatarForm((current) => ({
+        ...current,
+        url: myStore.profile.avatar?.url || "",
+      }))
 
-    setAvatarForm((current) => ({
-      ...current,
-      url: myStore.profile.avatar?.url || "",
-    }))
-
-    setCoverForm((current) => ({
-      ...current,
-      url: myStore.profile.cover?.url || "",
-    }))
-  }, [myStore, pendingProfileUpdate])
+      setCoverForm((current) => ({
+        ...current,
+        url: myStore.profile.cover?.url || "",
+      }))
+    }
+  }
 
   const updateProfileMutation = useMutation({
     mutationFn: ({ storeId, payload }: { storeId: string; payload: typeof profileForm }) =>

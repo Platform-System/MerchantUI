@@ -8,6 +8,8 @@ import {
   updateMyStorePolicy,
   requestMyStoreActivation,
 } from "../queries/store-manage-queries"
+import type { StoreUpdateRequestResponse } from "../queries/store-manage-queries"
+import type { StoreDetailsResponse } from "@/shared/lib/storefront-normalizers"
 
 const SHIPPING_POLICY_TEMPLATE = "- Phạm vi giao: \n- Thời gian nhận: \n- Phí vận chuyển: \n- Đồng kiểm: "
 const RETURN_POLICY_TEMPLATE = "- Thời hạn đổi trả: \n- Điều kiện đổi trả: \n- Phí ship đổi trả: "
@@ -15,9 +17,9 @@ const WARRANTY_POLICY_TEMPLATE = "- Thời hạn bảo hành: \n- Địa điểm
 
 export interface UseStorePoliciesProps {
   selectedStoreId: string | null
-  myStore: any
+  myStore: StoreDetailsResponse | null
   isActiveStore: boolean
-  pendingPolicyUpdate: any
+  pendingPolicyUpdate: StoreUpdateRequestResponse | null
   refreshStore: () => Promise<void>
 }
 
@@ -36,22 +38,24 @@ export function useStorePolicies({
     warrantyPolicy: WARRANTY_POLICY_TEMPLATE,
   })
 
-  React.useEffect(() => {
-    if (!myStore) return
-
-    const getPolicyValue = (val: string | null | undefined, template: string) => {
-      if (val === undefined || val === null || !val.trim()) {
-        return template
+  const [prevStoreAndPending, setPrevStoreAndPending] = React.useState({ myStore, pendingPolicyUpdate })
+  if (prevStoreAndPending.myStore !== myStore || prevStoreAndPending.pendingPolicyUpdate !== pendingPolicyUpdate) {
+    setPrevStoreAndPending({ myStore, pendingPolicyUpdate })
+    if (myStore) {
+      const getPolicyValue = (val: string | null | undefined, template: string) => {
+        if (val === undefined || val === null || !val.trim()) {
+          return template
+        }
+        return val
       }
-      return val
-    }
 
-    setPolicyForm({
-      shippingPolicy: (pendingPolicyUpdate?.shippingPolicy !== undefined && pendingPolicyUpdate?.shippingPolicy !== null) ? pendingPolicyUpdate.shippingPolicy : getPolicyValue(myStore.policy?.shippingPolicy, SHIPPING_POLICY_TEMPLATE),
-      returnPolicy: (pendingPolicyUpdate?.returnPolicy !== undefined && pendingPolicyUpdate?.returnPolicy !== null) ? pendingPolicyUpdate.returnPolicy : getPolicyValue(myStore.policy?.returnPolicy, RETURN_POLICY_TEMPLATE),
-      warrantyPolicy: (pendingPolicyUpdate?.warrantyPolicy !== undefined && pendingPolicyUpdate?.warrantyPolicy !== null) ? pendingPolicyUpdate.warrantyPolicy : getPolicyValue(myStore.policy?.warrantyPolicy, WARRANTY_POLICY_TEMPLATE),
-    })
-  }, [myStore, pendingPolicyUpdate])
+      setPolicyForm({
+        shippingPolicy: (pendingPolicyUpdate?.shippingPolicy !== undefined && pendingPolicyUpdate?.shippingPolicy !== null) ? pendingPolicyUpdate.shippingPolicy : getPolicyValue(myStore.policy?.shippingPolicy, SHIPPING_POLICY_TEMPLATE),
+        returnPolicy: (pendingPolicyUpdate?.returnPolicy !== undefined && pendingPolicyUpdate?.returnPolicy !== null) ? pendingPolicyUpdate.returnPolicy : getPolicyValue(myStore.policy?.returnPolicy, RETURN_POLICY_TEMPLATE),
+        warrantyPolicy: (pendingPolicyUpdate?.warrantyPolicy !== undefined && pendingPolicyUpdate?.warrantyPolicy !== null) ? pendingPolicyUpdate.warrantyPolicy : getPolicyValue(myStore.policy?.warrantyPolicy, WARRANTY_POLICY_TEMPLATE),
+      })
+    }
+  }
 
   const updatePolicyMutation = useMutation({
     mutationFn: ({ storeId, payload }: { storeId: string; payload: typeof policyForm }) =>

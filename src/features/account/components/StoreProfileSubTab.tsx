@@ -5,7 +5,7 @@ import { Loader2, Store, AlertTriangle } from "lucide-react"
 import { ProfilePreviewCard, Input, Button, Textarea, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@platform-system/design-ui"
 
 export interface StoreProfileSubTabProps {
-  myStore: any
+  myStore: import("@/shared/lib/storefront-normalizers").StoreDetailsResponse | null
   profileForm: {
     name: string
     tagline: string

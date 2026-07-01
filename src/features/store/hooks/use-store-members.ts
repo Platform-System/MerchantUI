@@ -10,9 +10,11 @@ import {
   storeManageQueryKeys,
 } from "../queries/store-manage-queries"
 
+import type { StoreDetailsResponse } from "@/shared/lib/storefront-normalizers"
+
 export interface UseStoreMembersProps {
   selectedStoreId: string | null
-  myStore: any
+  myStore: StoreDetailsResponse | null
   isActiveStore: boolean
 }
 

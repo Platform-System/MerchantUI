@@ -7,11 +7,11 @@ import { StoreOrder } from "@/types/store"
 
 export interface OrdersTabProps {
   orders: StoreOrder[]
-  ordersData: any[] | undefined
+  ordersData: Array<{ id: string; orderCode?: string | number }> | undefined
   statusClassName: (status: StoreOrder["status"]) => string
   setSelectedOrderId: (id: string | null) => void
   t: (key: string) => string
-  tc: (key: string, values?: any) => string
+  tc: (key: string, values?: Record<string, unknown>) => string
 }
 
 export function OrdersTab({

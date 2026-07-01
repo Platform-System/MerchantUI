@@ -132,14 +132,12 @@ export function useAccount() {
   const [activeTab, setActiveTabState] = React.useState(initialTab)
   const [profile, setProfile] = React.useState<StoreProfile>(DEFAULT_PROFILE)
 
-  React.useEffect(() => {
-    const tab = searchParams.get("tab")
-    if (tab && tab !== activeTab) {
-      setActiveTabState(tab)
-    } else if (!tab && activeTab !== "orders") {
-      setActiveTabState("orders")
-    }
-  }, [searchParams, activeTab])
+  const tabFromUrl = searchParams.get("tab") || "orders"
+  const [prevTabFromUrl, setPrevTabFromUrl] = React.useState(tabFromUrl)
+  if (tabFromUrl !== prevTabFromUrl) {
+    setPrevTabFromUrl(tabFromUrl)
+    setActiveTabState(tabFromUrl)
+  }
 
   const setActiveTab = React.useCallback((tab: string) => {
     setActiveTabState(tab)

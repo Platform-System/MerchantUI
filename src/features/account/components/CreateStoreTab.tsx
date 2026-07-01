@@ -8,8 +8,8 @@ import { StorePoliciesSubTab } from "./StorePoliciesSubTab"
 
 export interface CreateStoreTabProps {
   hasStore: boolean
-  myStore: any
-  myStores: any[]
+  myStore: import("@/shared/lib/storefront-normalizers").StoreDetailsResponse | null
+  myStores: import("@/shared/lib/storefront-normalizers").StoreProfileResponse[]
   selectedStoreId: string | null
   setSelectedStoreId: (id: string | null) => void
   createFormData: {
@@ -26,10 +26,11 @@ export interface CreateStoreTabProps {
     location: string
     responseTime: string
   }>>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createStoreMutation: any
   handleCreateStoreSubmit: (e: React.FormEvent) => void
   setActiveTab: (tab: string) => void
-  tBecome: (key: string, values?: any) => string
+  tBecome: (key: string, values?: Record<string, unknown>) => string
 
   // Setup props for Draft/PendingActive stores
   normalizedStatus: string
@@ -38,42 +39,76 @@ export interface CreateStoreTabProps {
   latestRejectionReason: string | null
   storeStatusLabel: string
   storeStatusHint: string
-  ts: (key: string, values?: any) => string
+  ts: (key: string, values?: Record<string, unknown>) => string
 
   // Profile Props
-  profileForm: any
-  setProfileForm: any
+  profileForm: {
+    name: string
+    tagline: string
+    description: string
+    location: string
+    responseTime: string
+  }
+  setProfileForm: React.Dispatch<React.SetStateAction<{
+    name: string
+    tagline: string
+    description: string
+    location: string
+    responseTime: string
+  }>>
   isProfileLocked: boolean
   isSavingProfile: boolean
-  coverForm: any
-  avatarForm: any
+  coverForm: {
+    url: string
+    blobName?: string
+    containerName?: string
+    fileName?: string
+    contentType?: string
+    size?: number
+  }
+  avatarForm: {
+    url: string
+    blobName?: string
+    containerName?: string
+    fileName?: string
+    contentType?: string
+    size?: number
+  }
   isUploadingAvatar: boolean
   isUploadingCover: boolean
   setIsCoverModalOpen: (open: boolean) => void
   setIsAvatarModalOpen: (open: boolean) => void
-  profileErrors: any
-  setProfileErrors: any
-  nameRef: any
-  taglineRef: any
-  locationRef: any
-  responseTimeRef: any
-  descriptionRef: any
+  profileErrors: Record<string, string>
+  setProfileErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>
+  nameRef: React.RefObject<HTMLInputElement | null>
+  taglineRef: React.RefObject<HTMLInputElement | null>
+  locationRef: React.RefObject<HTMLInputElement | null>
+  responseTimeRef: React.RefObject<HTMLInputElement | null>
+  descriptionRef: React.RefObject<HTMLTextAreaElement | null>
   handleSaveProfile: () => void
 
   // Policies Props
-  policyForm: any
-  setPolicyForm: any
+  policyForm: {
+    shippingPolicy: string
+    returnPolicy: string
+    warrantyPolicy: string
+  }
+  setPolicyForm: React.Dispatch<React.SetStateAction<{
+    shippingPolicy: string
+    returnPolicy: string
+    warrantyPolicy: string
+  }>>
   isPolicyLocked: boolean
   isSavingPolicy: boolean
   hasPendingPolicyUpdate: boolean
   canRequestActivation: boolean
   isRequestingActivation: boolean
-  policyErrors: any
-  setPolicyErrors: any
-  shippingPolicyRef: any
-  returnPolicyRef: any
-  warrantyPolicyRef: any
-  handlePolicyKeyDown: any
+  policyErrors: Record<string, string>
+  setPolicyErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>
+  shippingPolicyRef: React.RefObject<HTMLTextAreaElement | null>
+  returnPolicyRef: React.RefObject<HTMLTextAreaElement | null>
+  warrantyPolicyRef: React.RefObject<HTMLTextAreaElement | null>
+  handlePolicyKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void
   handleSavePolicy: () => void
   handleRequestActivation: () => void
 }
@@ -149,14 +184,11 @@ export function CreateStoreTab({
     })
   }, [myStores])
 
-  // Sync isCreatingNew with availability of draft stores
-  React.useEffect(() => {
-    if (draftStores.length === 0) {
-      setIsCreatingNew(true)
-    } else {
-      setIsCreatingNew(false)
-    }
-  }, [draftStores.length])
+  const [prevDraftStoresLength, setPrevDraftStoresLength] = React.useState(draftStores.length)
+  if (draftStores.length !== prevDraftStoresLength) {
+    setPrevDraftStoresLength(draftStores.length)
+    setIsCreatingNew(draftStores.length === 0)
+  }
 
   // Sync selectedStoreId with draftStores when editing
   React.useEffect(() => {

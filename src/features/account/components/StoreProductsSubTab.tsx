@@ -22,20 +22,20 @@ export interface StoreProductsSubTabProps {
   isActiveStore: boolean
   editingProductId: string | null
   resetProductForm: () => void
-  categories: any[]
+  categories: Array<{ id: string; name: string }>
   isLoadingCategories: boolean
   saveProduct: () => void
   isSavingProduct: boolean
   isLoadingMyPending: boolean
-  myPendingProducts: any[]
-  startEditingProduct: (product: any) => void
+  myPendingProducts: import("@/shared/lib/storefront-normalizers").CatalogProductResponse[]
+  startEditingProduct: (product: import("@/shared/lib/storefront-normalizers").CatalogProductResponse) => void
   deleteProduct: (id: string) => void
   isDeletingProduct: boolean
   isLoadingOwnerReview: boolean
-  ownerReviewProducts: any[]
+  ownerReviewProducts: import("@/shared/lib/storefront-normalizers").CatalogProductResponse[]
   approveProduct: (id: string) => void
   isApprovingProduct: boolean
-  ts: (key: string, values?: any) => string
+  ts: (key: string, values?: Record<string, unknown>) => string
 }
 
 export function StoreProductsSubTab({

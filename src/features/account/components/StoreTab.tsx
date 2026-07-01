@@ -10,8 +10,8 @@ import { StoreProductsSubTab } from "./StoreProductsSubTab"
 
 export interface StoreTabProps {
   hasStore: boolean
-  myStore: any
-  myStores: any[]
+  myStore: import("@/shared/lib/storefront-normalizers").StoreDetailsResponse | null
+  myStores: import("@/shared/lib/storefront-normalizers").StoreProfileResponse[]
   selectedStoreId: string | null
   setSelectedStoreId: (id: string | null) => void
   isStoreLoading: boolean
@@ -22,51 +22,93 @@ export interface StoreTabProps {
   storeStatusLabel: string
   storeStatusHint: string
   setActiveTab: (tab: string) => void
-  ts: (key: string, values?: any) => string
+  ts: (key: string, values?: Record<string, unknown>) => string
 
   // Profile Props
-  profileForm: any
-  setProfileForm: any
+  profileForm: {
+    name: string
+    tagline: string
+    description: string
+    location: string
+    responseTime: string
+  }
+  setProfileForm: React.Dispatch<React.SetStateAction<{
+    name: string
+    tagline: string
+    description: string
+    location: string
+    responseTime: string
+  }>>
   isProfileLocked: boolean
   isSavingProfile: boolean
-  coverForm: any
-  avatarForm: any
+  coverForm: {
+    url: string
+    blobName?: string
+    containerName?: string
+    fileName?: string
+    contentType?: string
+    size?: number
+  }
+  avatarForm: {
+    url: string
+    blobName?: string
+    containerName?: string
+    fileName?: string
+    contentType?: string
+    size?: number
+  }
   isUploadingAvatar: boolean
   isUploadingCover: boolean
   setIsCoverModalOpen: (open: boolean) => void
   setIsAvatarModalOpen: (open: boolean) => void
-  profileErrors: any
-  setProfileErrors: any
-  nameRef: any
-  taglineRef: any
-  locationRef: any
-  responseTimeRef: any
-  descriptionRef: any
+  profileErrors: Record<string, string>
+  setProfileErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>
+  nameRef: React.RefObject<HTMLInputElement | null>
+  taglineRef: React.RefObject<HTMLInputElement | null>
+  locationRef: React.RefObject<HTMLInputElement | null>
+  responseTimeRef: React.RefObject<HTMLInputElement | null>
+  descriptionRef: React.RefObject<HTMLTextAreaElement | null>
   handleSaveProfile: () => void
 
   // Policies Props
-  policyForm: any
-  setPolicyForm: any
+  policyForm: {
+    shippingPolicy: string
+    returnPolicy: string
+    warrantyPolicy: string
+  }
+  setPolicyForm: React.Dispatch<React.SetStateAction<{
+    shippingPolicy: string
+    returnPolicy: string
+    warrantyPolicy: string
+  }>>
   isPolicyLocked: boolean
   isSavingPolicy: boolean
   hasPendingPolicyUpdate: boolean
   canRequestActivation: boolean
   isRequestingActivation: boolean
-  policyErrors: any
-  setPolicyErrors: any
-  shippingPolicyRef: any
-  returnPolicyRef: any
-  warrantyPolicyRef: any
-  handlePolicyKeyDown: any
+  policyErrors: Record<string, string>
+  setPolicyErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>
+  shippingPolicyRef: React.RefObject<HTMLTextAreaElement | null>
+  returnPolicyRef: React.RefObject<HTMLTextAreaElement | null>
+  warrantyPolicyRef: React.RefObject<HTMLTextAreaElement | null>
+  handlePolicyKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void
   handleSavePolicy: () => void
   handleRequestActivation: () => void
 
   // Members Props
-  inviteForm: any
-  setInviteForm: any
+  inviteForm: {
+    userId: string
+    role: 1 | 2
+    canPublishProductDirectly: boolean
+  }
+  setInviteForm: React.Dispatch<React.SetStateAction<{
+    userId: string
+    role: 1 | 2
+    canPublishProductDirectly: boolean
+  }>>
   inviteMember: () => void
   isInvitingMember: boolean
-  members: any[]
+  members: import("../queries/store-manage-queries").StoreMemberResponse[]
   isLoadingMembers: boolean
   getMemberRoleLabel: (role: string) => string
   getMemberStatusLabel: (status: string) => string
@@ -74,21 +116,33 @@ export interface StoreTabProps {
   isSavingPublishPermission: boolean
 
   // Products Props
-  productForm: any
-  setProductForm: any
+  productForm: {
+    title: string
+    author: string
+    price: string
+    stock: string
+    categoryId: string
+  }
+  setProductForm: React.Dispatch<React.SetStateAction<{
+    title: string
+    author: string
+    price: string
+    stock: string
+    categoryId: string
+  }>>
   editingProductId: string | null
   resetProductForm: () => void
-  categories: any[]
+  categories: Array<{ id: string; name: string }>
   isLoadingCategories: boolean
   saveProduct: () => void
   isSavingProduct: boolean
   isLoadingMyPending: boolean
-  myPendingProducts: any[]
-  startEditingProduct: (product: any) => void
+  myPendingProducts: import("@/shared/lib/storefront-normalizers").CatalogProductResponse[]
+  startEditingProduct: (product: import("@/shared/lib/storefront-normalizers").CatalogProductResponse) => void
   deleteProduct: (id: string) => void
   isDeletingProduct: boolean
   isLoadingOwnerReview: boolean
-  ownerReviewProducts: any[]
+  ownerReviewProducts: import("@/shared/lib/storefront-normalizers").CatalogProductResponse[]
   approveProduct: (id: string) => void
   isApprovingProduct: boolean
 }
@@ -197,9 +251,11 @@ export function StoreTab({
     }
   }, [activeStores, selectedStoreId, setSelectedStoreId])
 
-  React.useEffect(() => {
+  const [prevSelectedStoreId, setPrevSelectedStoreId] = React.useState(selectedStoreId)
+  if (selectedStoreId !== prevSelectedStoreId) {
+    setPrevSelectedStoreId(selectedStoreId)
     setStoreSubTab("profile")
-  }, [selectedStoreId])
+  }
 
   const hasActiveStores = activeStores.length > 0
 

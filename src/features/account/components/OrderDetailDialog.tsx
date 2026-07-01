@@ -89,7 +89,7 @@ export function OrderDetailDialog({
                 <h4 className="font-semibold text-foreground">Sản phẩm đã chọn</h4>
               </div>
               <div className="divide-y divide-[rgb(var(--store-border-rgb)/0.3)]">
-                {orderDetails.items.map((item: any) => (
+                {orderDetails.items.map((item) => (
                   <div key={item.productId} className="flex justify-between items-center p-4">
                     <div>
                       <p className="font-medium text-foreground">{item.name}</p>

@@ -204,6 +204,24 @@ export async function fetchUserProfileById(userId: string): Promise<UserProfileR
   }
 }
 
+export interface UserMediaResponse {
+  type: string
+  url: string
+}
+
+export async function fetchUserAvatarById(userId: string): Promise<string | null> {
+  try {
+    const response = await apiClient.get<Result<UserMediaResponse>>(`/api/identity/users/${userId}/images/avatar`)
+    if (response.data?.success && response.data.data?.url) {
+      return response.data.data.url
+    }
+    return null
+  } catch (error) {
+    console.error(`Loi khi lay avatar user ${userId}:`, error)
+    return null
+  }
+}
+
 export interface StoreUpdateRequestResponse {
   id: string
   storeId: string
