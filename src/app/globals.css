@@ -3,6 +3,7 @@
 @source "../../node_modules/@platform-system/design-ui/src/**/*.tsx";
 @source "../../../node_modules/@platform-system/design-ui/src/**/*.tsx";
 @source "../../../Platform.DesignUI/src/**/*.tsx";
+/* Trigger CI build to resolve latest DesignUI commit SHA */
 
 @theme {
   --spacing-30: 7.5rem;
