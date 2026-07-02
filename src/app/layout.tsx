@@ -5,6 +5,7 @@ import QueryProvider from "@/core/providers/QueryProvider";
 import AuthProvider from "@/core/providers/AuthProvider";
 import { GlobalLoadingBar } from "@/shared/layout/GlobalLoadingBar";
 import "./globals.css";
+import "@/tailwind-safelist";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
