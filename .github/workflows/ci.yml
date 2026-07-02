@@ -30,6 +30,43 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Resolve Workspace Dependencies for CI Build
+        run: |
+          node -e "
+            const fs = require('fs');
+            const { execSync } = require('child_process');
+            const ghToken = process.env.GHCR_TOKEN;
+            const branchName = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || 'main';
+            function checkBranchExists(repoUrl, branch) {
+              try {
+                const authedUrl = repoUrl.replace('https://github.com/', 'https://' + ghToken + '@github.com/');
+                execSync('git ls-remote --heads ' + authedUrl + ' ' + branch, { stdio: 'ignore' });
+                return true;
+              } catch (e) { return false; }
+            }
+            if (fs.existsSync('package.json')) {
+              const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+              let modified = false;
+              if (pkg.dependencies) {
+                if (pkg.dependencies['@platform-system/design-ui'] === '*') {
+                  const targetBranch = checkBranchExists('https://github.com/Platform-System/Platform.DesignSystemUI.git', branchName) ? branchName : 'main';
+                  pkg.dependencies['@platform-system/design-ui'] = 'git+ssh://git@github.com/Platform-System/Platform.DesignSystemUI.git#' + targetBranch;
+                  modified = true;
+                }
+                if (pkg.dependencies['@platform-system/api-client'] === '*') {
+                  const targetBranch = checkBranchExists('https://github.com/Platform-System/Platform.ApiClient.git', branchName) ? branchName : 'main';
+                  pkg.dependencies['@platform-system/api-client'] = 'git+ssh://git@github.com/Platform-System/Platform.ApiClient.git#' + targetBranch;
+                  modified = true;
+                }
+              }
+              if (modified) {
+                fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n', 'utf8');
+              }
+            }
+          "
+        env:
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
         env:
