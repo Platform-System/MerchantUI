@@ -6,57 +6,6 @@
 
 @theme {
   --spacing-30: 7.5rem;
-
-  /* ── Design-UI theme variable mappings (single source: DesignUI/src/index.css @theme) ──
-   *  Tailwind v4 requires these in @theme to generate utility classes like bg-popover.
-   *  DesignUI's compiled dist/index.css does NOT include @theme output because it
-   *  doesn't import "tailwindcss". So each app must declare these mappings here.
-   *  If you add a new --color-xxx variable in DesignUI, also add it here. */
-  --font-sans: var(--font-family);
-  --font-mono: var(--font-family);
-  --font-serif: var(--font-family);
-
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: rgb(var(--store-accent-rgb));
-  --color-primary-foreground: #ffffff;
-  --color-secondary: rgb(var(--store-surface-strong-rgb));
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-gold: rgb(var(--store-accent-rgb));
-  --color-star: rgb(var(--store-star-rgb));
-  --color-charcoal: rgb(var(--store-ink-rgb));
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-success: var(--success);
-  --color-success-foreground: var(--success-foreground);
-  --color-warning: var(--warning);
-  --color-warning-foreground: var(--warning-foreground);
-  --color-info: var(--info);
-  --color-info-foreground: var(--info-foreground);
-
-  --animate-accordion-down: accordion-down 0.2s ease-out;
-  --animate-accordion-up: accordion-up 0.2s ease-out;
-
-  @keyframes accordion-down {
-    from { height: 0; }
-    to { height: var(--radix-accordion-content-height); }
-  }
-
-  @keyframes accordion-up {
-    from { height: var(--radix-accordion-content-height); }
-    to { height: 0; }
-  }
 }
 
 html,
