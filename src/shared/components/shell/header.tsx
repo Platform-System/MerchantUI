@@ -129,7 +129,10 @@ export function Header() {
   const [mobileSearchQuery, setMobileSearchQuery] = useState("")
 
   useEffect(() => {
-    const container = document.getElementById("store-scroll-container")
+    const storeContainer = document.getElementById("store-scroll-container")
+    const spaceContainer = document.getElementById("space-scroll-container")
+    const container = storeContainer || spaceContainer
+
     const handleScroll = () => {
       const scrollTop = container ? container.scrollTop : window.scrollY
       setIsScrolled((prev) => {
@@ -146,6 +149,13 @@ export function Header() {
       window.addEventListener("scroll", handleScroll, { passive: true })
     }
 
+    // Check initial scroll value on mount / page change
+    if (container) {
+      setIsScrolled(container.scrollTop > 35)
+    } else {
+      setIsScrolled(window.scrollY > 35)
+    }
+
     return () => {
       if (container) {
         container.removeEventListener("scroll", handleScroll)
@@ -153,7 +163,7 @@ export function Header() {
         window.removeEventListener("scroll", handleScroll)
       }
     }
-  }, [])
+  }, [pathname])
 
   useEffect(() => {
     if (typeof document !== "undefined") {

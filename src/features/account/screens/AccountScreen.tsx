@@ -550,7 +550,7 @@ export function AccountScreen() {
         </div>
 
         {/* Scrollable Content Pane */}
-        <div className="flex-1 overflow-y-auto p-6 pb-1 md:p-8 md:pb-1 lg:p-10 lg:pb-1 [overscroll-behavior-y:none]">
+        <div id="space-scroll-container" className="flex-1 overflow-y-auto p-6 pb-1 md:p-8 md:pb-1 lg:p-10 lg:pb-1 [overscroll-behavior-y:none]">
           <div className="w-full">
             <div className="ds-glass-panel rounded-3xl p-6 shadow-2xl sm:p-8">
               <AnimatePresence mode="wait">
