@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { motion } from "framer-motion"
 import { Store, Loader2, Info, AlertCircle, AlertTriangle, ArrowRight, Plus, List } from "lucide-react"
 import { Button, Input, Textarea, Badge, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@platform-system/design-ui"
 import { StoreProfileSubTab } from "./StoreProfileSubTab"
@@ -131,6 +132,8 @@ export interface CreateStoreTabProps {
   handlePolicyKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>, fieldName: "shippingPolicy" | "returnPolicy" | "warrantyPolicy") => void
   handleSavePolicy: () => void
   handleRequestActivation: () => void
+  setupSubTab: string
+  setSetupSubTab: React.Dispatch<React.SetStateAction<string>>
 }
 
 export function CreateStoreTab({
@@ -191,10 +194,9 @@ export function CreateStoreTab({
   handlePolicyKeyDown,
   handleSavePolicy,
   handleRequestActivation,
+  setupSubTab,
+  setSetupSubTab,
 }: CreateStoreTabProps) {
-  const [setupSubTab, setSetupSubTab] = React.useState("profile")
-  const [isCreatingNew, setIsCreatingNew] = React.useState(true)
-
   // Filter draft/pendingactive stores
   const draftStores = React.useMemo(() => {
     return myStores.filter(s => {
@@ -203,11 +205,7 @@ export function CreateStoreTab({
     })
   }, [myStores])
 
-  const [prevDraftStoresLength, setPrevDraftStoresLength] = React.useState(draftStores.length)
-  if (draftStores.length !== prevDraftStoresLength) {
-    setPrevDraftStoresLength(draftStores.length)
-    setIsCreatingNew(draftStores.length === 0)
-  }
+  const isCreatingNew = draftStores.length === 0
 
   // Sync selectedStoreId with draftStores when editing
   React.useEffect(() => {
@@ -247,7 +245,7 @@ export function CreateStoreTab({
                 value={createFormData.name}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCreateFormData(prev => ({ ...prev, name: e.target.value }))}
                 disabled={createStoreMutation.isPending}
-                className="rounded-xl border-[rgb(var(--store-border-rgb)/0.8)] focus:ring-1 focus:ring-primary"
+                className="rounded-xl border-[rgb(var(--store-border-rgb)/0.8)]"
               />
             </div>
 
@@ -259,7 +257,7 @@ export function CreateStoreTab({
                 value={createFormData.tagline}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCreateFormData(prev => ({ ...prev, tagline: e.target.value }))}
                 disabled={createStoreMutation.isPending}
-                className="rounded-xl border-[rgb(var(--store-border-rgb)/0.8)] focus:ring-1 focus:ring-primary"
+                className="rounded-xl border-[rgb(var(--store-border-rgb)/0.8)]"
               />
             </div>
           </div>
@@ -269,7 +267,7 @@ export function CreateStoreTab({
             <Textarea
               required
               placeholder={tBecome("shortDescriptionPlaceholder") || "Kể về hành trình sáng tạo những tuyệt tác của bạn tại Nyxoris..."}
-              className="min-h-[100px] rounded-xl border-[rgb(var(--store-border-rgb)/0.8)] focus:ring-1 focus:ring-primary"
+              className="min-h-[100px] rounded-xl border-[rgb(var(--store-border-rgb)/0.8)]"
               value={createFormData.description}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCreateFormData(prev => ({ ...prev, description: e.target.value }))}
               disabled={createStoreMutation.isPending}
@@ -285,7 +283,7 @@ export function CreateStoreTab({
                 value={createFormData.location}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCreateFormData(prev => ({ ...prev, location: e.target.value }))}
                 disabled={createStoreMutation.isPending}
-                className="rounded-xl border-[rgb(var(--store-border-rgb)/0.8)] focus:ring-1 focus:ring-primary"
+                className="rounded-xl border-[rgb(var(--store-border-rgb)/0.8)]"
               />
             </div>
 
@@ -297,7 +295,7 @@ export function CreateStoreTab({
                 value={createFormData.responseTime}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCreateFormData(prev => ({ ...prev, responseTime: e.target.value }))}
                 disabled={createStoreMutation.isPending}
-                className="rounded-xl border-[rgb(var(--store-border-rgb)/0.8)] focus:ring-1 focus:ring-primary"
+                className="rounded-xl border-[rgb(var(--store-border-rgb)/0.8)]"
               />
             </div>
           </div>
@@ -405,54 +403,61 @@ export function CreateStoreTab({
       </div>
 
       {/* Setup tab content */}
-      {setupSubTab === "profile" && (
-        <StoreProfileSubTab
-          myStore={myStore}
-          profileForm={profileForm}
-          setProfileForm={setProfileForm}
-          isProfileLocked={isProfileLocked}
-          isSavingProfile={isSavingProfile}
-          isPendingActive={isPendingActive}
-          coverForm={coverForm}
-          avatarForm={avatarForm}
-          isUploadingAvatar={isUploadingAvatar}
-          isUploadingCover={isUploadingCover}
-          setIsCoverModalOpen={setIsCoverModalOpen}
-          setIsAvatarModalOpen={setIsAvatarModalOpen}
-          profileErrors={profileErrors}
-          setProfileErrors={setProfileErrors}
-          nameRef={nameRef}
-          taglineRef={taglineRef}
-          locationRef={locationRef}
-          responseTimeRef={responseTimeRef}
-          descriptionRef={descriptionRef}
-          handleSaveProfile={handleSaveProfile}
-          ts={ts}
-        />
-      )}
+      <motion.div
+        key={setupSubTab}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {setupSubTab === "profile" && (
+          <StoreProfileSubTab
+            myStore={myStore}
+            profileForm={profileForm}
+            setProfileForm={setProfileForm}
+            isProfileLocked={isProfileLocked}
+            isSavingProfile={isSavingProfile}
+            isPendingActive={isPendingActive}
+            coverForm={coverForm}
+            avatarForm={avatarForm}
+            isUploadingAvatar={isUploadingAvatar}
+            isUploadingCover={isUploadingCover}
+            setIsCoverModalOpen={setIsCoverModalOpen}
+            setIsAvatarModalOpen={setIsAvatarModalOpen}
+            profileErrors={profileErrors}
+            setProfileErrors={setProfileErrors}
+            nameRef={nameRef}
+            taglineRef={taglineRef}
+            locationRef={locationRef}
+            responseTimeRef={responseTimeRef}
+            descriptionRef={descriptionRef}
+            handleSaveProfile={handleSaveProfile}
+            ts={ts}
+          />
+        )}
 
-      {setupSubTab === "policies" && (
-        <StorePoliciesSubTab
-          isActiveStore={isActiveStore}
-          policyForm={policyForm}
-          setPolicyForm={setPolicyForm}
-          isPolicyLocked={isPolicyLocked}
-          isSavingPolicy={isSavingPolicy}
-          isPendingActive={isPendingActive}
-          hasPendingPolicyUpdate={hasPendingPolicyUpdate}
-          canRequestActivation={canRequestActivation}
-          isRequestingActivation={isRequestingActivation}
-          policyErrors={policyErrors}
-          setPolicyErrors={setPolicyErrors}
-          shippingPolicyRef={shippingPolicyRef}
-          returnPolicyRef={returnPolicyRef}
-          warrantyPolicyRef={warrantyPolicyRef}
-          handlePolicyKeyDown={handlePolicyKeyDown}
-          handleSavePolicy={handleSavePolicy}
-          handleRequestActivation={handleRequestActivation}
-          ts={ts}
-        />
-      )}
+        {setupSubTab === "policies" && (
+          <StorePoliciesSubTab
+            isActiveStore={isActiveStore}
+            policyForm={policyForm}
+            setPolicyForm={setPolicyForm}
+            isPolicyLocked={isPolicyLocked}
+            isSavingPolicy={isSavingPolicy}
+            isPendingActive={isPendingActive}
+            hasPendingPolicyUpdate={hasPendingPolicyUpdate}
+            canRequestActivation={canRequestActivation}
+            isRequestingActivation={isRequestingActivation}
+            policyErrors={policyErrors}
+            setPolicyErrors={setPolicyErrors}
+            shippingPolicyRef={shippingPolicyRef}
+            returnPolicyRef={returnPolicyRef}
+            warrantyPolicyRef={warrantyPolicyRef}
+            handlePolicyKeyDown={handlePolicyKeyDown}
+            handleSavePolicy={handleSavePolicy}
+            handleRequestActivation={handleRequestActivation}
+            ts={ts}
+          />
+        )}
+      </motion.div>
 
       {canRequestActivation && (
         <div className="sticky bottom-2 z-20 flex justify-end mt-6 pointer-events-none">

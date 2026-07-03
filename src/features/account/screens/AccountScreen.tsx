@@ -12,6 +12,7 @@ import { useAccount } from "../hooks/use-account"
 import { useStoreManagement } from "@/features/store/hooks/use-store-management"
 import { useStoreProductManagement } from "@/features/store/hooks/use-store-product-management"
 import { toast } from "sonner"
+import { keycloak } from "@/shared/api/keycloak"
 
 // Subcomponents
 import { OrderDetailDialog } from "../components/OrderDetailDialog"
@@ -130,8 +131,18 @@ export function AccountScreen() {
     onSuccess: async (result) => {
       if (result.success) {
         toast.success(tBecome("toastSuccess") || "Đăng ký gian hàng thành công!")
+
+        // Force refresh Keycloak token so that new roles/claims are fetched
+        try {
+          if (keycloak) {
+            await keycloak.updateToken(-1)
+          }
+        } catch (err) {
+          console.error("Failed to force refresh keycloak token:", err)
+        }
+
         // Invalidate owned stores list
-        await queryClient.invalidateQueries({ queryKey: ["my-stores"] })
+        await queryClient.invalidateQueries({ queryKey: ["store-manage", "my-stores"] })
         
         // Reset form
         setCreateFormData({
@@ -148,8 +159,8 @@ export function AccountScreen() {
           setSelectedStoreId(newStoreId)
         }
 
-        // Switch to store management tab
-        setActiveTab("store")
+        // Keep them on "create-store" tab to finish setup
+        setActiveTab("create-store")
         return
       }
 
@@ -179,6 +190,8 @@ export function AccountScreen() {
   const [isAvatarModalOpen, setIsAvatarModalOpen] = React.useState(false)
   const [isCoverModalOpen, setIsCoverModalOpen] = React.useState(false)
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = React.useState(true)
+  const [storeSubTab, setStoreSubTab] = React.useState("profile")
+  const [setupSubTab, setSetupSubTab] = React.useState("profile")
 
   const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>({
     "Kênh người bán": true,
@@ -206,6 +219,16 @@ export function AccountScreen() {
     returnPolicy: false,
     warrantyPolicy: false,
   })
+
+  // Invalidate store queries on tab switch to ensure we always show fresh status (draft/pending/active)
+  React.useEffect(() => {
+    if (activeTab === "store" || activeTab === "create-store") {
+      queryClient.invalidateQueries({ queryKey: ["store-manage", "my-stores"] })
+      if (selectedStoreId) {
+        queryClient.invalidateQueries({ queryKey: ["store-manage", selectedStoreId] })
+      }
+    }
+  }, [activeTab, selectedStoreId, queryClient])
 
   // Refs for scroll and focus
   const nameRef = React.useRef<HTMLInputElement>(null)
@@ -343,36 +366,52 @@ export function AccountScreen() {
     const hasPolicyError = Object.values(policyErrs).some(Boolean)
 
     if (hasProfileError) {
-      if (profileErrs.name) {
-        nameRef.current?.focus()
-        nameRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
-      } else if (profileErrs.tagline) {
-        taglineRef.current?.focus()
-        taglineRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
-      } else if (profileErrs.location) {
-        locationRef.current?.focus()
-        locationRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
-      } else if (profileErrs.responseTime) {
-        responseTimeRef.current?.focus()
-        responseTimeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
-      } else if (profileErrs.description) {
-        descriptionRef.current?.focus()
-        descriptionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+      if (activeTab === "store" && storeSubTab !== "profile") {
+        setStoreSubTab("profile")
+      } else if (activeTab === "create-store" && setupSubTab !== "profile") {
+        setSetupSubTab("profile")
       }
+
+      setTimeout(() => {
+        if (profileErrs.name) {
+          nameRef.current?.focus()
+          nameRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+        } else if (profileErrs.tagline) {
+          taglineRef.current?.focus()
+          taglineRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+        } else if (profileErrs.location) {
+          locationRef.current?.focus()
+          locationRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+        } else if (profileErrs.responseTime) {
+          responseTimeRef.current?.focus()
+          responseTimeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+        } else if (profileErrs.description) {
+          descriptionRef.current?.focus()
+          descriptionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+        }
+      }, 50)
       return
     }
 
     if (hasPolicyError) {
-      if (policyErrs.shippingPolicy) {
-        shippingPolicyRef.current?.focus()
-        shippingPolicyRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
-      } else if (policyErrs.returnPolicy) {
-        returnPolicyRef.current?.focus()
-        returnPolicyRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
-      } else if (policyErrs.warrantyPolicy) {
-        warrantyPolicyRef.current?.focus()
-        warrantyPolicyRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+      if (activeTab === "store" && storeSubTab !== "policies") {
+        setStoreSubTab("policies")
+      } else if (activeTab === "create-store" && setupSubTab !== "policies") {
+        setSetupSubTab("policies")
       }
+
+      setTimeout(() => {
+        if (policyErrs.shippingPolicy) {
+          shippingPolicyRef.current?.focus()
+          shippingPolicyRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+        } else if (policyErrs.returnPolicy) {
+          returnPolicyRef.current?.focus()
+          returnPolicyRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+        } else if (policyErrs.warrantyPolicy) {
+          warrantyPolicyRef.current?.focus()
+          warrantyPolicyRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+        }
+      }, 50)
       return
     }
 
@@ -550,17 +589,15 @@ export function AccountScreen() {
         </div>
 
         {/* Scrollable Content Pane */}
-        <div id="space-scroll-container" className="flex-1 overflow-y-auto p-6 pb-1 md:p-8 md:pb-1 lg:p-10 lg:pb-1 [overscroll-behavior-y:none]">
+        <div id="space-scroll-container" className="flex-1 overflow-y-auto p-6 pb-12 md:p-8 md:pb-16 lg:p-10 lg:pb-20 [overscroll-behavior-y:none]">
           <div className="w-full">
             <div className="ds-glass-panel rounded-3xl p-6 shadow-2xl sm:p-8">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeTab}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.2, ease: "easeInOut" }}
-                >
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              >
                   {activeTab === "orders" && (
                     <OrdersTab
                       orders={orders}
@@ -625,6 +662,8 @@ export function AccountScreen() {
                       handlePolicyKeyDown={handlePolicyKeyDown}
                       handleSavePolicy={handleSavePolicy}
                       handleRequestActivation={handleRequestActivation}
+                      storeSubTab={storeSubTab}
+                      setStoreSubTab={setStoreSubTab}
 
                       // Members Props
                       inviteForm={inviteForm}
@@ -718,6 +757,8 @@ export function AccountScreen() {
                       handlePolicyKeyDown={handlePolicyKeyDown}
                       handleSavePolicy={handleSavePolicy}
                       handleRequestActivation={handleRequestActivation}
+                      setupSubTab={setupSubTab}
+                      setSetupSubTab={setSetupSubTab}
                     />
                   )}
 
@@ -732,7 +773,6 @@ export function AccountScreen() {
                     />
                   )}
                 </motion.div>
-              </AnimatePresence>
             </div>
           </div>
         </div>

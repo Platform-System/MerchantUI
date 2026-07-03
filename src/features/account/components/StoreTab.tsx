@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { motion } from "framer-motion"
 import { Loader2, Store } from "lucide-react"
 import { Badge, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, Button } from "@platform-system/design-ui"
 import { StoreProfileSubTab } from "./StoreProfileSubTab"
@@ -23,6 +24,8 @@ export interface StoreTabProps {
   storeStatusHint: string
   setActiveTab: (tab: string) => void
   ts: (key: string, values?: Record<string, string | number | Date>) => string
+  storeSubTab: string
+  setStoreSubTab: React.Dispatch<React.SetStateAction<string>>
 
   // Profile Props
   profileForm: {
@@ -184,6 +187,8 @@ export function StoreTab({
   storeStatusHint,
   setActiveTab,
   ts,
+  storeSubTab,
+  setStoreSubTab,
 
   // Profile
   profileForm,
@@ -253,8 +258,6 @@ export function StoreTab({
   approveProduct,
   isApprovingProduct,
 }: StoreTabProps) {
-  const [storeSubTab, setStoreSubTab] = React.useState("profile")
-
   // Filter active/suspended stores
   const activeStores = React.useMemo(() => {
     return myStores.filter(s => {
@@ -273,11 +276,9 @@ export function StoreTab({
     }
   }, [activeStores, selectedStoreId, setSelectedStoreId])
 
-  const [prevSelectedStoreId, setPrevSelectedStoreId] = React.useState(selectedStoreId)
-  if (selectedStoreId !== prevSelectedStoreId) {
-    setPrevSelectedStoreId(selectedStoreId)
+  React.useEffect(() => {
     setStoreSubTab("profile")
-  }
+  }, [selectedStoreId, setStoreSubTab])
 
   const hasActiveStores = activeStores.length > 0
 
@@ -412,95 +413,102 @@ export function StoreTab({
           </div>
 
           {/* Subtab content switches */}
-          {storeSubTab === "profile" && (
-            <StoreProfileSubTab
-              myStore={myStore}
-              profileForm={profileForm}
-              setProfileForm={setProfileForm}
-              isProfileLocked={isProfileLocked}
-              isSavingProfile={isSavingProfile}
-              isPendingActive={false}
-              coverForm={coverForm}
-              avatarForm={avatarForm}
-              isUploadingAvatar={isUploadingAvatar}
-              isUploadingCover={isUploadingCover}
-              setIsCoverModalOpen={setIsCoverModalOpen}
-              setIsAvatarModalOpen={setIsAvatarModalOpen}
-              profileErrors={profileErrors}
-              setProfileErrors={setProfileErrors}
-              nameRef={nameRef}
-              taglineRef={taglineRef}
-              locationRef={locationRef}
-              responseTimeRef={responseTimeRef}
-              descriptionRef={descriptionRef}
-              handleSaveProfile={handleSaveProfile}
-              ts={ts}
-            />
-          )}
+          <motion.div
+            key={storeSubTab}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {storeSubTab === "profile" && (
+              <StoreProfileSubTab
+                myStore={myStore}
+                profileForm={profileForm}
+                setProfileForm={setProfileForm}
+                isProfileLocked={isProfileLocked}
+                isSavingProfile={isSavingProfile}
+                isPendingActive={false}
+                coverForm={coverForm}
+                avatarForm={avatarForm}
+                isUploadingAvatar={isUploadingAvatar}
+                isUploadingCover={isUploadingCover}
+                setIsCoverModalOpen={setIsCoverModalOpen}
+                setIsAvatarModalOpen={setIsAvatarModalOpen}
+                profileErrors={profileErrors}
+                setProfileErrors={setProfileErrors}
+                nameRef={nameRef}
+                taglineRef={taglineRef}
+                locationRef={locationRef}
+                responseTimeRef={responseTimeRef}
+                descriptionRef={descriptionRef}
+                handleSaveProfile={handleSaveProfile}
+                ts={ts}
+              />
+            )}
 
-          {storeSubTab === "policies" && (
-            <StorePoliciesSubTab
-              isActiveStore={isActiveStore}
-              policyForm={policyForm}
-              setPolicyForm={setPolicyForm}
-              isPolicyLocked={isPolicyLocked}
-              isSavingPolicy={isSavingPolicy}
-              isPendingActive={false}
-              hasPendingPolicyUpdate={hasPendingPolicyUpdate}
-              canRequestActivation={canRequestActivation}
-              isRequestingActivation={isRequestingActivation}
-              policyErrors={policyErrors}
-              setPolicyErrors={setPolicyErrors}
-              shippingPolicyRef={shippingPolicyRef}
-              returnPolicyRef={returnPolicyRef}
-              warrantyPolicyRef={warrantyPolicyRef}
-              handlePolicyKeyDown={handlePolicyKeyDown}
-              handleSavePolicy={handleSavePolicy}
-              handleRequestActivation={handleRequestActivation}
-              ts={ts}
-            />
-          )}
+            {storeSubTab === "policies" && (
+              <StorePoliciesSubTab
+                isActiveStore={isActiveStore}
+                policyForm={policyForm}
+                setPolicyForm={setPolicyForm}
+                isPolicyLocked={isPolicyLocked}
+                isSavingPolicy={isSavingPolicy}
+                isPendingActive={false}
+                hasPendingPolicyUpdate={hasPendingPolicyUpdate}
+                canRequestActivation={canRequestActivation}
+                isRequestingActivation={isRequestingActivation}
+                policyErrors={policyErrors}
+                setPolicyErrors={setPolicyErrors}
+                shippingPolicyRef={shippingPolicyRef}
+                returnPolicyRef={returnPolicyRef}
+                warrantyPolicyRef={warrantyPolicyRef}
+                handlePolicyKeyDown={handlePolicyKeyDown}
+                handleSavePolicy={handleSavePolicy}
+                handleRequestActivation={handleRequestActivation}
+                ts={ts}
+              />
+            )}
 
-          {storeSubTab === "members" && isActiveStore && (
-            <StoreMembersSubTab
-              inviteForm={inviteForm}
-              setInviteForm={setInviteForm}
-              inviteMember={inviteMember}
-              isInvitingMember={isInvitingMember}
-              members={members}
-              isLoadingMembers={isLoadingMembers}
-              getMemberRoleLabel={getMemberRoleLabel}
-              getMemberStatusLabel={getMemberStatusLabel}
-              savePublishPermission={savePublishPermission}
-              isSavingPublishPermission={isSavingPublishPermission}
-              isActiveStore={isActiveStore}
-              ts={ts}
-            />
-          )}
+            {storeSubTab === "members" && isActiveStore && (
+              <StoreMembersSubTab
+                inviteForm={inviteForm}
+                setInviteForm={setInviteForm}
+                inviteMember={inviteMember}
+                isInvitingMember={isInvitingMember}
+                members={members}
+                isLoadingMembers={isLoadingMembers}
+                getMemberRoleLabel={getMemberRoleLabel}
+                getMemberStatusLabel={getMemberStatusLabel}
+                savePublishPermission={savePublishPermission}
+                isSavingPublishPermission={isSavingPublishPermission}
+                isActiveStore={isActiveStore}
+                ts={ts}
+              />
+            )}
 
-          {storeSubTab === "products" && isActiveStore && (
-            <StoreProductsSubTab
-              productForm={productForm}
-              setProductForm={setProductForm}
-              isActiveStore={isActiveStore}
-              editingProductId={editingProductId}
-              resetProductForm={resetProductForm}
-              categories={categories}
-              isLoadingCategories={isLoadingCategories}
-              saveProduct={saveProduct}
-              isSavingProduct={isSavingProduct}
-              isLoadingMyPending={isLoadingMyPending}
-              myPendingProducts={myPendingProducts}
-              startEditingProduct={startEditingProduct}
-              deleteProduct={deleteProduct}
-              isDeletingProduct={isDeletingProduct}
-              isLoadingOwnerReview={isLoadingOwnerReview}
-              ownerReviewProducts={ownerReviewProducts}
-              approveProduct={approveProduct}
-              isApprovingProduct={isApprovingProduct}
-              ts={ts}
-            />
-          )}
+            {storeSubTab === "products" && isActiveStore && (
+              <StoreProductsSubTab
+                productForm={productForm}
+                setProductForm={setProductForm}
+                isActiveStore={isActiveStore}
+                editingProductId={editingProductId}
+                resetProductForm={resetProductForm}
+                categories={categories}
+                isLoadingCategories={isLoadingCategories}
+                saveProduct={saveProduct}
+                isSavingProduct={isSavingProduct}
+                isLoadingMyPending={isLoadingMyPending}
+                myPendingProducts={myPendingProducts}
+                startEditingProduct={startEditingProduct}
+                deleteProduct={deleteProduct}
+                isDeletingProduct={isDeletingProduct}
+                isLoadingOwnerReview={isLoadingOwnerReview}
+                ownerReviewProducts={ownerReviewProducts}
+                approveProduct={approveProduct}
+                isApprovingProduct={isApprovingProduct}
+                ts={ts}
+              />
+            )}
+          </motion.div>
         </>
       )}
     </div>
