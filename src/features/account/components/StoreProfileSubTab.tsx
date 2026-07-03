@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Loader2, Store, AlertTriangle } from "lucide-react"
-import { ProfilePreviewCard, Input, Button, Textarea, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@platform-system/design-ui"
+import { Loader2, Store, AlertTriangle, Camera } from "lucide-react"
+import { Input, Button, Textarea, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@platform-system/design-ui"
 
 export interface StoreProfileSubTabProps {
   myStore: import("@/shared/lib/storefront-normalizers").StoreDetailsResponse | null
@@ -108,21 +108,83 @@ export function StoreProfileSubTab({
           <p className="text-xs text-muted-foreground">{ts("storePreviewDesc")}</p>
         </div>
 
-        <ProfilePreviewCard
-          coverUrl={coverForm.url}
-          avatarUrl={avatarForm.url}
-          avatarShape="circle"
-          fallbackAvatarIcon={<Store className="h-8 w-8 opacity-40" />}
-          title={profileForm.name || myStore?.profile.name}
-          subtitle={profileForm.tagline || myStore?.profile.tagline}
-          description={profileForm.description || myStore?.profile.description}
-          subtitlePlaceholder={ts("taglinePlaceholder")}
-          descriptionPlaceholder={ts("descriptionPlaceholder")}
-          isUploadingAvatar={isUploadingAvatar}
-          isUploadingCover={isUploadingCover}
-          onCoverClick={isProfileLocked ? undefined : () => setIsCoverModalOpen(true)}
-          onAvatarClick={isProfileLocked ? undefined : () => setIsAvatarModalOpen(true)}
-        />
+        <div className="overflow-hidden rounded-2xl border border-[rgb(var(--store-border-rgb)/0.6)] bg-card">
+          {/* Cover image area */}
+          <div
+            className="relative h-48 w-full overflow-hidden cursor-pointer group"
+            onClick={isProfileLocked ? undefined : () => setIsCoverModalOpen(true)}
+          >
+            {coverForm.url ? (
+              <img
+                src={coverForm.url}
+                alt={(profileForm.name || myStore?.profile.name) || "Cover image"}
+                className="absolute inset-0 size-full object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-zinc-100 bg-[linear-gradient(to_right,rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:14px_24px]" />
+            )}
+            {!isProfileLocked && (
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-300">
+                <Camera className="h-8 w-8 text-white scale-90 group-hover:scale-100 transition-all duration-300" />
+              </div>
+            )}
+            {isUploadingCover && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white text-xs font-semibold gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                {ts("uploading") || "Đang tải lên..."}
+              </div>
+            )}
+          </div>
+
+          {/* Profile/details area */}
+          <div className="relative px-5 pb-5 pt-0">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-4">
+              {/* Avatar block with offset */}
+              <div
+                className="relative -mt-8 h-16 w-16 shrink-0 overflow-hidden border-4 border-background bg-background rounded-full shadow-md cursor-pointer group z-20"
+                onClick={isProfileLocked ? undefined : () => setIsAvatarModalOpen(true)}
+              >
+                {avatarForm.url ? (
+                  <img
+                    src={avatarForm.url}
+                    alt={(profileForm.name || myStore?.profile.name) || "Avatar"}
+                    className="absolute inset-0 size-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center bg-zinc-100 text-muted-foreground">
+                    <Store className="h-8 w-8 opacity-40" />
+                  </div>
+                )}
+                {!isProfileLocked && (
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-300">
+                    <Camera className="h-6 w-6 text-white scale-90 group-hover:scale-100 transition-all duration-300" />
+                  </div>
+                )}
+                {isUploadingAvatar && (
+                  <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white text-[9px] font-semibold">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin mb-0.5" />
+                    Tải lên...
+                  </div>
+                )}
+              </div>
+
+              {/* Text descriptions */}
+              <div className="flex-1 min-w-0 pt-4 sm:pt-3">
+                <div className="flex flex-col gap-0">
+                  <h4 className="text-lg font-semibold text-foreground leading-snug">
+                    {profileForm.name || myStore?.profile.name}
+                  </h4>
+                  <p className="text-sm text-muted-foreground leading-normal mt-0.5">
+                    {profileForm.tagline || myStore?.profile.tagline || ts("taglinePlaceholder")}
+                  </p>
+                </div>
+                <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
+                  {profileForm.description || myStore?.profile.description || ts("descriptionPlaceholder")}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="space-y-4 rounded-2xl border border-[rgb(var(--store-border-rgb)/0.7)] p-5">

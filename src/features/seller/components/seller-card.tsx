@@ -18,7 +18,7 @@ export function SellerCard({ seller }: SellerCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       viewport={{ once: true }}
-      className="ds-glass-panel group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl transition-all duration-300 hover:shadow-lg"
+      className="ds-glass-panel group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-[rgb(var(--store-border-rgb)/0.6)] shadow-[0_12px_30px_rgb(0_0_0/0.08)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_48px_rgb(0_0_0/0.16)]"
     >
       {/* Link Overlay */}
       <Link href={`/seller/${seller.slug}`} scroll={false} className="absolute inset-0 z-20" aria-label={`Xem gian hàng ${seller.name}`} />
@@ -40,11 +40,6 @@ export function SellerCard({ seller }: SellerCardProps) {
           <AvatarImage src={seller.avatar} alt={seller.name} className="object-cover" />
           <AvatarFallback>{seller.name.substring(0, 2).toUpperCase()}</AvatarFallback>
         </Avatar>
-        {seller.verified && (
-          <div className="store-accent-soft absolute bottom-0 right-1/2 flex translate-x-8 items-center justify-center rounded-full p-1">
-            <Check className="store-accent-text h-3 w-3" strokeWidth={3} />
-          </div>
-        )}
       </div>
 
       {/* Content */}

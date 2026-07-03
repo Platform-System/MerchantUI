@@ -101,9 +101,11 @@ export function MemberRow({
             <Shield className="size-2.5" />
             {getMemberRoleLabel(member.role)}
           </Badge>
-          <span className="text-[9px] text-muted-foreground">
-            ({getMemberStatusLabel(member.status)})
-          </span>
+          {member.status.toLowerCase() !== "active" && (
+            <span className="text-[9px] text-muted-foreground">
+              ({getMemberStatusLabel(member.status)})
+            </span>
+          )}
         </div>
       </td>
 
