@@ -94,13 +94,7 @@ export function MemberRow({
       {/* Vai trò */}
       <td className="p-4">
         <div className="flex flex-col items-center justify-center gap-0.5">
-          <Badge
-            variant={isOwner ? "default" : "secondary"}
-            className="flex items-center gap-1 text-[10px] px-1.5 py-0"
-          >
-            <Shield className="size-2.5" />
-            {getMemberRoleLabel(member.role)}
-          </Badge>
+          <span className="font-medium text-foreground">{getMemberRoleLabel(member.role)}</span>
           {member.status.toLowerCase() !== "active" && (
             <span className="text-[9px] text-muted-foreground">
               ({getMemberStatusLabel(member.status)})
