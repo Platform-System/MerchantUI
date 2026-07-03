@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@iconify/react": "^6.0.2",
-    "@platform-system/api-client": "git+ssh://git@github.com/Platform-System/Platform.ApiClient.git#60c6a2c",
-    "@platform-system/design-ui": "git+ssh://git@github.com/Platform-System/Platform.DesignSystemUI.git#1096954cc32dfa0436b568256084fb9dc740dd73",
+    "@platform-system/api-client": "*",
+    "@platform-system/design-ui": "*",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.8",
