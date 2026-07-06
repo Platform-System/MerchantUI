@@ -150,13 +150,17 @@ export function Header() {
     }
 
     // Check initial scroll value on mount / page change
-    if (container) {
-      setIsScrolled(container.scrollTop > 35)
-    } else {
-      setIsScrolled(window.scrollY > 35)
+    const checkInitialScroll = () => {
+      if (container) {
+        setIsScrolled(container.scrollTop > 35)
+      } else {
+        setIsScrolled(window.scrollY > 35)
+      }
     }
+    const timeoutId = setTimeout(checkInitialScroll, 0)
 
     return () => {
+      clearTimeout(timeoutId)
       if (container) {
         container.removeEventListener("scroll", handleScroll)
       } else {

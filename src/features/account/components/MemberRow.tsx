@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useQuery } from "@tanstack/react-query"
-import { Calendar, Shield, User } from "lucide-react"
+import { Calendar, User } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage, Badge, Button } from "@platform-system/design-ui"
 import { fetchUserProfileById, fetchUserAvatarById, StoreMemberResponse } from "@/features/store/queries/store-manage-queries"
 

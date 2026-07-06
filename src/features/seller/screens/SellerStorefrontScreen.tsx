@@ -19,7 +19,6 @@ import {
   Truck,
   RotateCcw,
   ShieldCheck,
-  Check,
 } from "lucide-react"
 import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, EmptyStatePanel, FilterBar, RatingStars, Spinner, Tabs, TabsContent, TabsList, TabsTrigger, cn } from '@platform-system/design-ui';
 import { ProductCard } from "@/features/product"
