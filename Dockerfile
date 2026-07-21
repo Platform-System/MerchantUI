@@ -9,7 +9,9 @@ ARG GHCR_TOKEN
 ENV GHCR_TOKEN=$GHCR_TOKEN
 
 COPY package.json ./
-RUN git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "ssh://git@github.com/" && \
+RUN git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "https://github.com/" && \
+    git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "git+https://github.com/" && \
+    git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "ssh://git@github.com/" && \
     git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "git@github.com:"
 RUN --mount=type=cache,target=/root/.npm npm install --legacy-peer-deps
 

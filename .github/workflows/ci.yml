@@ -28,7 +28,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Resolve Workspace Dependencies for CI Build
         run: |
@@ -49,13 +49,13 @@ jobs:
               let modified = false;
               if (pkg.dependencies) {
                 if (pkg.dependencies['@system/design-ui'] === '*') {
-                  const targetBranch = checkBranchExists('https://github.com/Platform-System/DesignSystemUI.git', branchName) ? branchName : 'main';
-                  pkg.dependencies['@system/design-ui'] = 'git+ssh://git@github.com/Platform-System/DesignSystemUI.git#' + targetBranch;
+                  const targetBranch = checkBranchExists('https://github.com/Platform-System/Platform.DesignSystemUI.git', branchName) ? branchName : 'main';
+                  pkg.dependencies['@system/design-ui'] = 'git+https://github.com/Platform-System/Platform.DesignSystemUI.git#' + targetBranch;
                   modified = true;
                 }
                 if (pkg.dependencies['@system/api-client'] === '*') {
-                  const targetBranch = checkBranchExists('https://github.com/Platform-System/ApiClient.git', branchName) ? branchName : 'main';
-                  pkg.dependencies['@system/api-client'] = 'git+ssh://git@github.com/Platform-System/ApiClient.git#' + targetBranch;
+                  const targetBranch = checkBranchExists('https://github.com/Platform-System/Platform.ApiClient.git', branchName) ? branchName : 'main';
+                  pkg.dependencies['@system/api-client'] = 'git+https://github.com/Platform-System/Platform.ApiClient.git#' + targetBranch;
                   modified = true;
                 }
               }
