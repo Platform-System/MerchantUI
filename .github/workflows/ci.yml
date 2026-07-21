@@ -82,7 +82,7 @@ jobs:
     needs: verify
     uses: Platform-System/CI-CD/.github/workflows/build-nextjs.yml@main
     with:
-      image_name: 'platform-merchant-ui'
+      image_name: 'merchant-ui'
       push_image: true
       build_args: |
         NEXT_PUBLIC_API_URL=${{ vars.PUBLIC_API_URL }}
