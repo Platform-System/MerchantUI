@@ -19,8 +19,7 @@ export interface UpdateStorePolicyRequest {
 
 export interface InviteStoreMemberRequest {
   userId: string
-  role: 1 | 2
-  canPublishProductDirectly: boolean
+  roleId: string
 }
 
 export interface SetStoreImageRequest {
@@ -198,8 +197,29 @@ export async function fetchUserProfileById(userId: string): Promise<UserProfileR
       return response.data.data
     }
     return null
-  } catch (error) {
-    console.error(`Loi khi lay thong tin user ${userId}:`, error)
+  } catch (error: unknown) {
+    const apiError = error as AxiosError
+    if (apiError.response?.status !== 404) {
+      console.error(`Loi khi lay thong tin user ${userId}:`, error)
+    }
+    return null
+  }
+}
+
+export async function lookupUser(query: string): Promise<UserProfileResponse | null> {
+  try {
+    const response = await apiClient.get<Result<UserProfileResponse>>(`/api/identity/users/lookup`, {
+      params: { query }
+    })
+    if (response.data?.success && response.data.data) {
+      return response.data.data
+    }
+    return null
+  } catch (error: unknown) {
+    const apiError = error as AxiosError
+    if (apiError.response?.status !== 404) {
+      console.error(`Loi khi lookup user:`, error)
+    }
     return null
   }
 }
@@ -284,3 +304,46 @@ export async function fetchStoreActivationRequests(storeId: string): Promise<Sto
   }
   return []
 }
+
+export interface StoreRoleResponse {
+  id: string
+  name: string
+  description: string
+  isSystem: boolean
+}
+
+export async function fetchStoreRoles(storeId: string): Promise<StoreRoleResponse[]> {
+  const response = await apiClient.get<Result<StoreRoleResponse[]>>(`/api/store/manage/stores/${storeId}/roles`)
+  if (response.data?.success && response.data.data) {
+    return response.data.data
+  }
+  return []
+}
+
+export interface StoreSentInvitationResponse {
+  storeId: string
+  storeName: string
+  role: string
+  status: string
+  invitedAt: string
+  expiredAt: string
+  userId: string
+  ownerId?: string | null
+}
+
+export async function fetchStoreSentInvitations(storeId: string, page = 1, pageSize = 100): Promise<PagedResult<StoreSentInvitationResponse>> {
+  const response = await apiClient.get<Result<PagedResult<StoreSentInvitationResponse>>>(`/api/store/manage/stores/${storeId}/invitations`, {
+    params: { page, pageSize }
+  })
+  if (response.data?.success && response.data.data) {
+    return response.data.data
+  }
+  return { items: [], page, pageSize, totalCount: 0 }
+}
+
+export async function cancelStoreInvitation(storeId: string, userId: string): Promise<Result<unknown>> {
+  const response = await apiClient.delete<Result<unknown>>(`/api/store/manage/stores/${storeId}/members/invitations/${userId}`)
+  return response.data
+}
+
+

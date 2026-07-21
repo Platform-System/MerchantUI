@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Search, X, Clock, ArrowRight } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { Button, Input, OverlayBackdrop } from '@platform-system/design-ui';
+import { Button, Input, OverlayBackdrop } from '@system/design-ui';
 import { Link } from "@/i18n/navigation"
 import { useQuery } from "@tanstack/react-query"
 import { fetchAllProducts, productQueryKeys } from "@/features/product"

@@ -1,10 +1,10 @@
 @import "tailwindcss" source(none);
-@import "@platform-system/design-ui/index.css";
+@import "@system/design-ui/index.css";
 @source "../../**/*.tsx";
 @source "../../**/*.ts";
-@source "../../node_modules/@platform-system/design-ui/src/**/*.tsx";
-@source "../../../node_modules/@platform-system/design-ui/src/**/*.tsx";
-@source "../../../Platform.DesignUI/src/**/*.tsx";
+@source "../../node_modules/@system/design-ui/src/**/*.tsx";
+@source "../../../node_modules/@system/design-ui/src/**/*.tsx";
+@source "../../../DesignUI/src/**/*.tsx";
 
 
 @theme {
@@ -41,7 +41,7 @@ body {
 
 
 
-/* Theme mappings for @platform-system/design-ui colors */
+/* Theme mappings for @system/design-ui colors */
 @theme {
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);

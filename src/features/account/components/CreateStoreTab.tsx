@@ -3,7 +3,7 @@
 import * as React from "react"
 import { motion } from "framer-motion"
 import { Store, Loader2, Info, AlertCircle, AlertTriangle, ArrowRight, Plus, List } from "lucide-react"
-import { Button, Input, Textarea, Badge, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@platform-system/design-ui"
+import { Button, Input, Textarea, Badge, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@system/design-ui"
 import { StoreProfileSubTab } from "./StoreProfileSubTab"
 import { StorePoliciesSubTab } from "./StorePoliciesSubTab"
 
@@ -301,7 +301,7 @@ export function CreateStoreTab({
           </div>
 
           <div className="mt-2 rounded-xl bg-[rgb(var(--store-accent-rgb)/0.05)] p-4 text-xs text-muted-foreground leading-relaxed border border-[rgb(var(--store-accent-rgb)/0.1)]">
-            <p><strong>{tBecome("trustNoteTitle") || "Thông tin xác thực:"}</strong> {tBecome("trustNote") || "Hệ thống sẽ tự động liên kết tài khoản của bạn với tư cách là Chủ sở hữu (Owner). Các chính sách vận chuyển và đổi trả có thể được cập nhật sau khi gian hàng được kích hoạt."}</p>
+            <p><strong>{tBecome("trustNoteTitle") || "Thông tin xác thực:"}</strong> {tBecome("trustNote") || "Hệ thống sẽ tự động liên kết tài khoản của bạn với tư cách là Chủ sở hữu. Các chính sách vận chuyển và đổi trả có thể được cập nhật sau khi gian hàng được kích hoạt."}</p>
           </div>
 
           <Button 

@@ -32,30 +32,40 @@ export function useStorePolicies({
 }: UseStorePoliciesProps) {
   const t = useTranslations("Account.store")
 
-  const [policyForm, setPolicyForm] = React.useState({
-    shippingPolicy: SHIPPING_POLICY_TEMPLATE,
-    returnPolicy: RETURN_POLICY_TEMPLATE,
-    warrantyPolicy: WARRANTY_POLICY_TEMPLATE,
-  })
-
-  const [prevStoreAndPending, setPrevStoreAndPending] = React.useState({ myStore, pendingPolicyUpdate })
-  if (prevStoreAndPending.myStore !== myStore || prevStoreAndPending.pendingPolicyUpdate !== pendingPolicyUpdate) {
-    setPrevStoreAndPending({ myStore, pendingPolicyUpdate })
-    if (myStore) {
-      const getPolicyValue = (val: string | null | undefined, template: string) => {
-        if (val === undefined || val === null || !val.trim()) {
-          return template
-        }
-        return val
-      }
-
-      setPolicyForm({
-        shippingPolicy: (pendingPolicyUpdate?.shippingPolicy !== undefined && pendingPolicyUpdate?.shippingPolicy !== null) ? pendingPolicyUpdate.shippingPolicy : getPolicyValue(myStore.policy?.shippingPolicy, SHIPPING_POLICY_TEMPLATE),
-        returnPolicy: (pendingPolicyUpdate?.returnPolicy !== undefined && pendingPolicyUpdate?.returnPolicy !== null) ? pendingPolicyUpdate.returnPolicy : getPolicyValue(myStore.policy?.returnPolicy, RETURN_POLICY_TEMPLATE),
-        warrantyPolicy: (pendingPolicyUpdate?.warrantyPolicy !== undefined && pendingPolicyUpdate?.warrantyPolicy !== null) ? pendingPolicyUpdate.warrantyPolicy : getPolicyValue(myStore.policy?.warrantyPolicy, WARRANTY_POLICY_TEMPLATE),
-      })
+  const getPolicyValue = React.useCallback((value: string | null | undefined, template: string) => {
+    if (value === undefined || value === null || !value.trim()) {
+      return template
     }
-  }
+
+    return value
+  }, [])
+
+  const basePolicyForm = React.useMemo(() => ({
+    shippingPolicy: pendingPolicyUpdate?.shippingPolicy ?? getPolicyValue(myStore?.policy?.shippingPolicy, SHIPPING_POLICY_TEMPLATE),
+    returnPolicy: pendingPolicyUpdate?.returnPolicy ?? getPolicyValue(myStore?.policy?.returnPolicy, RETURN_POLICY_TEMPLATE),
+    warrantyPolicy: pendingPolicyUpdate?.warrantyPolicy ?? getPolicyValue(myStore?.policy?.warrantyPolicy, WARRANTY_POLICY_TEMPLATE),
+  }), [getPolicyValue, myStore, pendingPolicyUpdate])
+
+  const [policyDraft, setPolicyDraft] = React.useState<{
+    storeId: string | null
+    form: typeof basePolicyForm
+  } | null>(null)
+
+  const policyForm = policyDraft?.storeId === selectedStoreId
+    ? policyDraft.form
+    : basePolicyForm
+
+  const setPolicyForm: React.Dispatch<React.SetStateAction<typeof basePolicyForm>> = React.useCallback((value) => {
+    setPolicyDraft((current) => {
+      const currentForm = current?.storeId === selectedStoreId ? current.form : basePolicyForm
+      const nextForm = typeof value === "function" ? value(currentForm) : value
+
+      return {
+        storeId: selectedStoreId,
+        form: nextForm,
+      }
+    })
+  }, [basePolicyForm, selectedStoreId])
 
   const updatePolicyMutation = useMutation({
     mutationFn: ({ storeId, payload }: { storeId: string; payload: typeof policyForm }) =>
@@ -63,6 +73,7 @@ export function useStorePolicies({
     onSuccess: async (result) => {
       if (result.success) {
         toast.success(isActiveStore ? t("policyUpdateRequested") || "Yêu cầu thay đổi chính sách đã được gửi." : t("policySaved"))
+        setPolicyDraft(null)
         await refreshStore()
       } else {
         toast.error(result.message || t("requestFailed"))

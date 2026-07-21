@@ -5,7 +5,7 @@ import Image from "next/image"
 import { Link } from "@/i18n/navigation"
 import { motion } from "framer-motion"
 import { Heart, ShoppingBag, Eye, BadgeCheck } from "lucide-react"
-import { Badge, Button, RatingStars, cn } from '@platform-system/design-ui';
+import { Badge, Button, RatingStars, cn } from '@system/design-ui';
 import { useCart } from "@/features/cart"
 import { useWishlist } from "@/features/wishlist"
 import { QuickViewDialog } from "./quick-view-dialog"

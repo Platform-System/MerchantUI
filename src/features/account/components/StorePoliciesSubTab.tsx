@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Info } from "lucide-react"
-import { Textarea, Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@platform-system/design-ui"
+import { Textarea, Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@system/design-ui"
 import { SHIPPING_POLICY_TEMPLATE, RETURN_POLICY_TEMPLATE, WARRANTY_POLICY_TEMPLATE } from "@/features/store/hooks/use-store-management"
 
 export interface StorePoliciesSubTabProps {

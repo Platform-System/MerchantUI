@@ -4,7 +4,7 @@ import React from "react"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
 import { ArrowLeft, CheckCircle2, CreditCard, MapPin, ShieldCheck, Truck } from "lucide-react"
-import { Button, EmptyStatePanel, InfoPanel, Input, SurfaceIcon, Textarea } from '@platform-system/design-ui';
+import { Button, EmptyStatePanel, InfoPanel, Input, SurfaceIcon, Textarea } from '@system/design-ui';
 import { Link } from "@/i18n/navigation"
 import { useCheckout } from "../hooks/use-checkout"
 import { OrderSuccessScreen } from "./OrderSuccessScreen"

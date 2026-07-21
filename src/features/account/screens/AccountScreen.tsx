@@ -3,13 +3,18 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { motion, AnimatePresence } from "framer-motion"
-import { ImageCropper, SidebarSectionTrigger, cn } from "@platform-system/design-ui"
+import { ImageCropper, SidebarSectionTrigger, cn } from "@system/design-ui"
 import { Mail, PlusCircle, ChevronLeft, ChevronRight, Store, Package } from "lucide-react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { createStore } from "@/features/seller/queries/seller-queries"
 import type { Result } from "@/types/api"
 import { useAccount } from "../hooks/use-account"
-import { useStoreManagement } from "@/features/store/hooks/use-store-management"
+import {
+  useStoreManagement,
+  SHIPPING_POLICY_TEMPLATE,
+  RETURN_POLICY_TEMPLATE,
+  WARRANTY_POLICY_TEMPLATE
+} from "@/features/store/hooks/use-store-management"
 import { useStoreProductManagement } from "@/features/store/hooks/use-store-product-management"
 import { toast } from "sonner"
 import { keycloak } from "@/shared/api/keycloak"
@@ -31,6 +36,20 @@ function dataURLtoFile(dataurl: string, filename: string): File {
     u8arr[n] = bstr.charCodeAt(n)
   }
   return new File([u8arr], filename, { type: mime })
+}
+
+function isPolicyInvalid(value: string | null | undefined, template: string): boolean {
+  if (!value || !value.trim()) return true
+  if (value.trim() === template.trim()) return true
+
+  const lines = value.split("\n").map(l => l.trim()).filter(Boolean)
+  const templateLines = template.split("\n").map(l => l.trim()).filter(Boolean)
+
+  const allLinesEmpty = lines.every(line =>
+    templateLines.some(tLine => line === tLine || line === tLine.replace(/:$/, "").trim())
+  )
+
+  return allLinesEmpty
 }
 
 export function AccountScreen() {
@@ -93,6 +112,11 @@ export function AccountScreen() {
     hasPendingProfileUpdate,
     hasPendingPolicyUpdate,
     activationRequests,
+    storeRoles,
+    storeSentInvitations,
+    isLoadingSentInvitations,
+    cancelSentInvitation,
+    isCancelingInvitation,
   } = useStoreManagement()
 
   const {
@@ -320,9 +344,9 @@ export function AccountScreen() {
 
   const handleSavePolicy = () => {
     const errors = {
-      shippingPolicy: !policyForm.shippingPolicy?.trim(),
-      returnPolicy: !policyForm.returnPolicy?.trim(),
-      warrantyPolicy: !policyForm.warrantyPolicy?.trim(),
+      shippingPolicy: isPolicyInvalid(policyForm.shippingPolicy, SHIPPING_POLICY_TEMPLATE),
+      returnPolicy: isPolicyInvalid(policyForm.returnPolicy, RETURN_POLICY_TEMPLATE),
+      warrantyPolicy: isPolicyInvalid(policyForm.warrantyPolicy, WARRANTY_POLICY_TEMPLATE),
     }
 
     setPolicyErrors(errors)
@@ -354,9 +378,9 @@ export function AccountScreen() {
       description: !profileForm.description?.trim(),
     }
     const policyErrs = {
-      shippingPolicy: !policyForm.shippingPolicy?.trim(),
-      returnPolicy: !policyForm.returnPolicy?.trim(),
-      warrantyPolicy: !policyForm.warrantyPolicy?.trim(),
+      shippingPolicy: isPolicyInvalid(policyForm.shippingPolicy, SHIPPING_POLICY_TEMPLATE),
+      returnPolicy: isPolicyInvalid(policyForm.returnPolicy, RETURN_POLICY_TEMPLATE),
+      warrantyPolicy: isPolicyInvalid(policyForm.warrantyPolicy, WARRANTY_POLICY_TEMPLATE),
     }
 
     setProfileErrors(profileErrs)
@@ -676,6 +700,11 @@ export function AccountScreen() {
                       getMemberStatusLabel={getMemberStatusLabel}
                       savePublishPermission={savePublishPermission}
                       isSavingPublishPermission={isSavingPublishPermission}
+                      storeRoles={storeRoles}
+                      storeSentInvitations={storeSentInvitations}
+                      isLoadingSentInvitations={isLoadingSentInvitations}
+                      cancelSentInvitation={cancelSentInvitation}
+                      isCancelingInvitation={isCancelingInvitation}
 
                       // Products Props
                       productForm={productForm}

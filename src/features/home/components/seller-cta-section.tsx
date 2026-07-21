@@ -3,7 +3,7 @@
 import { Link } from "@/i18n/navigation"
 import { motion } from "framer-motion"
 import { ArrowRight, Store, TrendingUp, Users, Shield } from "lucide-react"
-import { Button } from '@platform-system/design-ui';
+import { Button } from '@system/design-ui';
 import { useTranslations } from "next-intl"
 import { useQuery } from "@tanstack/react-query"
 import { fetchSellerStats, sellerQueryKeys } from "@/features/seller"

@@ -1,6 +1,6 @@
-# Platform.MerchantUI
+# MerchantUI
 
-Merchant storefront UI built with Next.js. This app currently uses `@platform/api-client` to call the gateway at `NEXT_PUBLIC_API_URL`.
+Merchant storefront UI built with Next.js. This app currently uses `@api-client` to call the gateway at `NEXT_PUBLIC_API_URL`.
 
 ## Environment
 

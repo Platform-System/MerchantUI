@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   compress: true,
   poweredByHeader: false,
-  transpilePackages: ["@platform-system/design-ui", "@platform-system/api-client"],
+  transpilePackages: ["@system/design-ui", "@system/api-client"],
   experimental: {
     externalDir: true,
   },

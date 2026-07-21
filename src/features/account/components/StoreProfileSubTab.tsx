@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Loader2, Store, AlertTriangle, Camera } from "lucide-react"
-import { Input, Button, Textarea, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@platform-system/design-ui"
+import { Input, Button, Textarea, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@system/design-ui"
 
 export interface StoreProfileSubTabProps {
   myStore: import("@/shared/lib/storefront-normalizers").StoreDetailsResponse | null

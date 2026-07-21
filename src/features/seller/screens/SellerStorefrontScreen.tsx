@@ -20,7 +20,7 @@ import {
   RotateCcw,
   ShieldCheck,
 } from "lucide-react"
-import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, EmptyStatePanel, FilterBar, RatingStars, Spinner, Tabs, TabsContent, TabsList, TabsTrigger, cn } from '@platform-system/design-ui';
+import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, EmptyStatePanel, FilterBar, RatingStars, Spinner, Tabs, TabsContent, TabsList, TabsTrigger, cn } from '@system/design-ui';
 import { ProductCard } from "@/features/product"
 import { useSellerStorefront } from "../hooks/use-seller-storefront"
 import { Link } from "@/i18n/navigation"

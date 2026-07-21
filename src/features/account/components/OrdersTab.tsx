@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Package } from "lucide-react"
-import { Button, Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "@platform-system/design-ui"
+import { Button, Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "@system/design-ui"
 import { StoreOrder } from "@/types/store"
 
 export interface OrdersTabProps {

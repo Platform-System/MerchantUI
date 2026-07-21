@@ -4,7 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { Link } from "@/i18n/navigation"
 import { Heart, ShoppingBag, Minus, Plus, Share2, ChevronLeft, ChevronRight, Check } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage, Badge, Button, Dialog, DialogContent, DialogDescription, DialogTitle, RatingStars, cn } from '@platform-system/design-ui';
+import { Avatar, AvatarFallback, AvatarImage, Badge, Button, Dialog, DialogContent, DialogDescription, DialogTitle, RatingStars, cn } from '@system/design-ui';
 import { useCart } from "@/features/cart"
 import { useWishlist } from "@/features/wishlist"
 import { Product } from "@/types/store"

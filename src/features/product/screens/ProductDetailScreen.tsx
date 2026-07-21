@@ -21,7 +21,7 @@ import {
   MapPin,
   MessageCircle,
 } from "lucide-react"
-import { Button, Calendar, ChartContainer, ChartTooltip, ChartTooltipContent, EmptyStatePanel, InfoPanel, RatingStars, SurfaceIcon, Tabs, TabsContent, TabsList, TabsTrigger, cn } from '@platform-system/design-ui';
+import { Button, Calendar, ChartContainer, ChartTooltip, ChartTooltipContent, EmptyStatePanel, InfoPanel, RatingStars, SurfaceIcon, Tabs, TabsContent, TabsList, TabsTrigger, cn } from '@system/design-ui';
 import { Link } from "@/i18n/navigation"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 import { ProductDetailSkeleton } from "../index"

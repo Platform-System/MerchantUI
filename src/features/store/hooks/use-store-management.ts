@@ -161,6 +161,11 @@ export function useStoreManagement() {
     isLoadingMembers: membersProps.isLoadingMembers,
     savePublishPermission: membersProps.savePublishPermission,
     isSavingPublishPermission: membersProps.isSavingPublishPermission,
+    storeRoles: membersProps.storeRoles,
+    storeSentInvitations: membersProps.storeSentInvitations,
+    isLoadingSentInvitations: membersProps.isLoadingSentInvitations,
+    cancelSentInvitation: membersProps.cancelSentInvitation,
+    isCancelingInvitation: membersProps.isCancelingInvitation,
 
     // Invitations Props
     acceptInviteStoreId: invitationsProps.acceptInviteStoreId,

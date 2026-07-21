@@ -4,7 +4,7 @@ import React from "react"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
 import { ArrowLeft, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react"
-import { Button, EmptyStatePanel, InfoPanel, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@platform-system/design-ui';
+import { Button, EmptyStatePanel, InfoPanel, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@system/design-ui';
 import { Link } from "@/i18n/navigation"
 import { useCart } from "../context/CartContext"
 import { CART_COLOR_OPTIONS, CART_SIZE_OPTIONS } from "../constants"

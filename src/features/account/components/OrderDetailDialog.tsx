@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Loader2 } from "lucide-react"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Button } from "@platform-system/design-ui"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Button } from "@system/design-ui"
 import { useOrderDetails } from "../hooks/use-account"
 
 export interface OrderDetailDialogProps {

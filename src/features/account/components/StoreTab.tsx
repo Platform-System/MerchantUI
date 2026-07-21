@@ -3,7 +3,7 @@
 import * as React from "react"
 import { motion } from "framer-motion"
 import { Loader2, Store } from "lucide-react"
-import { Badge, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, Button } from "@platform-system/design-ui"
+import { Badge, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, Button } from "@system/design-ui"
 import { StoreProfileSubTab } from "./StoreProfileSubTab"
 import { StorePoliciesSubTab } from "./StorePoliciesSubTab"
 import { StoreMembersSubTab } from "./StoreMembersSubTab"
@@ -121,15 +121,14 @@ export interface StoreTabProps {
   // Members Props
   inviteForm: {
     userId: string
-    role: 1 | 2
-    canPublishProductDirectly: boolean
+    roleId: string
   }
   setInviteForm: React.Dispatch<React.SetStateAction<{
     userId: string
-    role: 1 | 2
-    canPublishProductDirectly: boolean
+    roleId: string
   }>>
-  inviteMember: () => void
+  storeRoles: import("../../store/queries/store-manage-queries").StoreRoleResponse[]
+  inviteMember: (resolvedUserId?: string) => void
   isInvitingMember: boolean
   members: import("../../store/queries/store-manage-queries").StoreMemberResponse[]
   isLoadingMembers: boolean
@@ -137,6 +136,10 @@ export interface StoreTabProps {
   getMemberStatusLabel: (status: string) => string
   savePublishPermission: (userId: string, canPublishDirectly: boolean) => void
   isSavingPublishPermission: boolean
+  storeSentInvitations: import("../../store/queries/store-manage-queries").StoreSentInvitationResponse[]
+  isLoadingSentInvitations: boolean
+  cancelSentInvitation: (userId: string) => void
+  isCancelingInvitation: boolean
 
   // Products Props
   productForm: {
@@ -238,6 +241,11 @@ export function StoreTab({
   getMemberStatusLabel,
   savePublishPermission,
   isSavingPublishPermission,
+  storeRoles,
+  storeSentInvitations,
+  isLoadingSentInvitations,
+  cancelSentInvitation,
+  isCancelingInvitation,
 
   // Products
   productForm,
@@ -482,6 +490,11 @@ export function StoreTab({
                 isSavingPublishPermission={isSavingPublishPermission}
                 isActiveStore={isActiveStore}
                 ts={ts}
+                storeRoles={storeRoles}
+                storeSentInvitations={storeSentInvitations}
+                isLoadingSentInvitations={isLoadingSentInvitations}
+                cancelSentInvitation={cancelSentInvitation}
+                isCancelingInvitation={isCancelingInvitation}
               />
             )}
 

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import Keycloak from 'keycloak-js';
-import { Spinner } from '@platform-system/design-ui';
+import { Spinner } from '@system/design-ui';
 import { keycloak } from '@/shared/api/keycloak';
 
 interface AuthContextType {

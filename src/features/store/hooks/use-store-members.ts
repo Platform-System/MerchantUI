@@ -8,6 +8,13 @@ import {
   inviteStoreMember,
   updateStoreMemberPublishPermission,
   storeManageQueryKeys,
+  lookupUser,
+  fetchStoreRoles,
+  StoreRoleResponse,
+  InviteStoreMemberRequest,
+  fetchStoreSentInvitations,
+  StoreSentInvitationResponse,
+  cancelStoreInvitation,
 } from "../queries/store-manage-queries"
 
 import type { StoreDetailsResponse } from "@/shared/lib/storefront-normalizers"
@@ -28,9 +35,57 @@ export function useStoreMembers({
 
   const [inviteForm, setInviteForm] = React.useState({
     userId: "",
-    role: 1 as 1 | 2,
-    canPublishProductDirectly: false,
+    roleId: "",
   })
+
+  const { data: storeRoles = [] } = useQuery({
+    queryKey: ["store-manage", selectedStoreId, "roles"],
+    queryFn: () => selectedStoreId ? fetchStoreRoles(selectedStoreId) : [],
+    enabled: !!selectedStoreId && Boolean(myStore?.profile.id),
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const rolesToSelect = React.useMemo(() => {
+    return storeRoles.filter(r => r.name.toLowerCase() !== "owner")
+  }, [storeRoles])
+
+  const resolvedInviteForm = React.useMemo(() => ({
+    ...inviteForm,
+    roleId: inviteForm.roleId || rolesToSelect[0]?.id || "",
+  }), [inviteForm, rolesToSelect])
+  const [isLookingUpUser, setIsLookingUpUser] = React.useState(false)
+
+  const { data: storeSentInvitationsData, isLoading: isLoadingSentInvitations } = useQuery({
+    queryKey: ["store-manage", selectedStoreId, "sent-invitations"],
+    queryFn: () => selectedStoreId ? fetchStoreSentInvitations(selectedStoreId, 1, 100) : null,
+    enabled: !!selectedStoreId && Boolean(myStore?.profile.id) && isActiveStore,
+    staleTime: 30 * 1000,
+  })
+
+  const storeSentInvitations = storeSentInvitationsData?.items || []
+
+  const cancelInviteMutation = useMutation({
+    mutationFn: ({ storeId, userId }: { storeId: string; userId: string }) => cancelStoreInvitation(storeId, userId),
+    onSuccess: async (result) => {
+      if (result.success) {
+        toast.success("Đã hủy lời mời thành công.")
+        if (selectedStoreId) {
+          await queryClient.invalidateQueries({ queryKey: ["store-manage", selectedStoreId, "sent-invitations"] })
+        }
+      } else {
+        toast.error(result.message || t("requestFailed"))
+      }
+    },
+    onError: (error: AxiosError<{ message?: string }>) => {
+      toast.error(error.response?.data?.message || t("requestFailed"))
+    },
+  })
+
+  const cancelSentInvitation = (userId: string) => {
+    if (selectedStoreId) {
+      cancelInviteMutation.mutate({ storeId: selectedStoreId, userId })
+    }
+  }
 
   const { data: members = [], isLoading: isLoadingMembers } = useQuery({
     queryKey: selectedStoreId ? storeManageQueryKeys.members(selectedStoreId) : ["store-manage", "none", "members"],
@@ -40,17 +95,19 @@ export function useStoreMembers({
   })
 
   const inviteMemberMutation = useMutation({
-    mutationFn: ({ storeId, payload }: { storeId: string; payload: typeof inviteForm }) => inviteStoreMember(storeId, payload),
+    mutationFn: ({ storeId, payload }: { storeId: string; payload: InviteStoreMemberRequest }) => inviteStoreMember(storeId, payload),
     onSuccess: async (result) => {
       if (result.success) {
         toast.success(t("inviteSent"))
         setInviteForm({
           userId: "",
-          role: 1,
-          canPublishProductDirectly: false,
+          roleId: rolesToSelect[0]?.id || "",
         })
         if (selectedStoreId) {
-          await queryClient.invalidateQueries({ queryKey: storeManageQueryKeys.members(selectedStoreId) })
+          await Promise.all([
+            queryClient.invalidateQueries({ queryKey: storeManageQueryKeys.members(selectedStoreId) }),
+            queryClient.invalidateQueries({ queryKey: ["store-manage", selectedStoreId, "sent-invitations"] })
+          ])
         }
       } else {
         toast.error(result.message || t("requestFailed"))
@@ -79,13 +136,43 @@ export function useStoreMembers({
     },
   })
 
-  const inviteMember = () => {
-    if (selectedStoreId) {
-      inviteMemberMutation.mutate({
-        storeId: selectedStoreId,
-        payload: inviteForm,
-      })
+  const inviteMember = async (resolvedUserId?: string) => {
+    if (!selectedStoreId) return
+
+    const inputVal = inviteForm.userId.trim()
+    if (!inputVal) return
+
+    let targetUserId = resolvedUserId || inputVal
+
+    if (!resolvedUserId) {
+      const isGuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(inputVal)
+
+      if (!isGuid) {
+        setIsLookingUpUser(true)
+        try {
+          const user = await lookupUser(inputVal)
+          if (!user) {
+            toast.error("Không tìm thấy thành viên với Email hoặc Username đã nhập.")
+            setIsLookingUpUser(false)
+            return
+          }
+          targetUserId = user.identityId
+        } catch (error) {
+          toast.error("Có lỗi xảy ra khi kiểm tra thông tin thành viên.")
+          setIsLookingUpUser(false)
+          return
+        }
+        setIsLookingUpUser(false)
+      }
     }
+
+    inviteMemberMutation.mutate({
+        storeId: selectedStoreId,
+        payload: {
+          userId: targetUserId,
+          roleId: resolvedInviteForm.roleId,
+        },
+      })
   }
 
   const savePublishPermission = (userId: string, canPublishProductDirectly: boolean) => {
@@ -99,13 +186,18 @@ export function useStoreMembers({
   }
 
   return {
-    inviteForm,
+    inviteForm: resolvedInviteForm,
     setInviteForm,
     members,
     isLoadingMembers,
     inviteMember,
     savePublishPermission,
-    isInvitingMember: inviteMemberMutation.isPending,
+    isInvitingMember: inviteMemberMutation.isPending || isLookingUpUser,
     isSavingPublishPermission: publishPermissionMutation.isPending,
+    storeRoles,
+    storeSentInvitations,
+    isLoadingSentInvitations,
+    cancelSentInvitation,
+    isCancelingInvitation: cancelInviteMutation.isPending,
   }
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
-import { BRAND_METADATA, ThemeProvider, Toaster, SonnerToaster } from '@platform-system/design-ui';
+import { BRAND_METADATA, ThemeProvider, Toaster, SonnerToaster } from '@system/design-ui';
 import QueryProvider from "@/core/providers/QueryProvider";
 import AuthProvider from "@/core/providers/AuthProvider";
 import { GlobalLoadingBar } from "@/shared/layout/GlobalLoadingBar";

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useQuery } from "@tanstack/react-query"
 import { Calendar, User } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage, Badge, Button } from "@platform-system/design-ui"
+import { Avatar, AvatarFallback, AvatarImage, Badge, Button } from "@system/design-ui"
 import { fetchUserProfileById, fetchUserAvatarById, StoreMemberResponse } from "@/features/store/queries/store-manage-queries"
 
 export interface MemberRowProps {

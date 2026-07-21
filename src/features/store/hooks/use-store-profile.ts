@@ -29,55 +29,75 @@ export function useStoreProfile({
 }: UseStoreProfileProps) {
   const t = useTranslations("Account.store")
 
-  const [profileForm, setProfileForm] = React.useState({
-    name: "",
-    tagline: "",
-    description: "",
-    location: "",
-    responseTime: "",
-  })
+  const baseProfileForm = React.useMemo(() => ({
+    name: pendingProfileUpdate?.name ?? myStore?.profile.name ?? "",
+    tagline: pendingProfileUpdate?.tagline ?? myStore?.profile.tagline ?? "",
+    description: pendingProfileUpdate?.description ?? myStore?.profile.description ?? "",
+    location: pendingProfileUpdate?.location ?? myStore?.profile.location ?? "",
+    responseTime: pendingProfileUpdate?.responseTime ?? myStore?.profile.responseTime ?? "",
+  }), [myStore, pendingProfileUpdate])
 
-  const [avatarForm, setAvatarForm] = React.useState({
+  const baseAvatarForm = React.useMemo(() => ({
     blobName: "",
     containerName: "",
     fileName: "",
     contentType: "",
     size: 0,
-    url: "",
-  })
+    url: myStore?.profile.avatar?.url || "",
+  }), [myStore])
 
-  const [coverForm, setCoverForm] = React.useState({
+  const baseCoverForm = React.useMemo(() => ({
     blobName: "",
     containerName: "",
     fileName: "",
     contentType: "",
     size: 0,
-    url: "",
-  })
+    url: myStore?.profile.cover?.url || "",
+  }), [myStore])
 
-  const [prevStoreAndPending, setPrevStoreAndPending] = React.useState({ myStore, pendingProfileUpdate })
-  if (prevStoreAndPending.myStore !== myStore || prevStoreAndPending.pendingProfileUpdate !== pendingProfileUpdate) {
-    setPrevStoreAndPending({ myStore, pendingProfileUpdate })
-    if (myStore) {
-      setProfileForm({
-        name: (pendingProfileUpdate?.name !== undefined && pendingProfileUpdate?.name !== null) ? pendingProfileUpdate.name : (myStore.profile.name || ""),
-        tagline: (pendingProfileUpdate?.tagline !== undefined && pendingProfileUpdate?.tagline !== null) ? pendingProfileUpdate.tagline : (myStore.profile.tagline || ""),
-        description: (pendingProfileUpdate?.description !== undefined && pendingProfileUpdate?.description !== null) ? pendingProfileUpdate.description : (myStore.profile.description || ""),
-        location: (pendingProfileUpdate?.location !== undefined && pendingProfileUpdate?.location !== null) ? pendingProfileUpdate.location : (myStore.profile.location || ""),
-        responseTime: (pendingProfileUpdate?.responseTime !== undefined && pendingProfileUpdate?.responseTime !== null) ? pendingProfileUpdate.responseTime : (myStore.profile.responseTime || ""),
-      })
+  const [profileDraft, setProfileDraft] = React.useState<{ storeId: string | null; form: typeof baseProfileForm } | null>(null)
+  const [avatarDraft, setAvatarDraft] = React.useState<{ storeId: string | null; form: typeof baseAvatarForm } | null>(null)
+  const [coverDraft, setCoverDraft] = React.useState<{ storeId: string | null; form: typeof baseCoverForm } | null>(null)
 
-      setAvatarForm((current) => ({
-        ...current,
-        url: myStore.profile.avatar?.url || "",
-      }))
+  const profileForm = profileDraft?.storeId === selectedStoreId ? profileDraft.form : baseProfileForm
+  const avatarForm = avatarDraft?.storeId === selectedStoreId ? avatarDraft.form : baseAvatarForm
+  const coverForm = coverDraft?.storeId === selectedStoreId ? coverDraft.form : baseCoverForm
 
-      setCoverForm((current) => ({
-        ...current,
-        url: myStore.profile.cover?.url || "",
-      }))
-    }
-  }
+  const setProfileForm: React.Dispatch<React.SetStateAction<typeof baseProfileForm>> = React.useCallback((value) => {
+    setProfileDraft((current) => {
+      const currentForm = current?.storeId === selectedStoreId ? current.form : baseProfileForm
+      const nextForm = typeof value === "function" ? value(currentForm) : value
+
+      return {
+        storeId: selectedStoreId,
+        form: nextForm,
+      }
+    })
+  }, [baseProfileForm, selectedStoreId])
+
+  const setAvatarForm: React.Dispatch<React.SetStateAction<typeof baseAvatarForm>> = React.useCallback((value) => {
+    setAvatarDraft((current) => {
+      const currentForm = current?.storeId === selectedStoreId ? current.form : baseAvatarForm
+      const nextForm = typeof value === "function" ? value(currentForm) : value
+
+      return {
+        storeId: selectedStoreId,
+        form: nextForm,
+      }
+    })
+  }, [baseAvatarForm, selectedStoreId])
+
+  const setCoverForm: React.Dispatch<React.SetStateAction<typeof baseCoverForm>> = React.useCallback((value) => {
+    setCoverDraft((current) => {
+      const currentForm = current?.storeId === selectedStoreId ? current.form : baseCoverForm
+      const nextForm = typeof value === "function" ? value(currentForm) : value
+
+      return {
+        storeId: selectedStoreId,
+        form: nextForm,
+      }
+    })
+  }, [baseCoverForm, selectedStoreId])
 
   const updateProfileMutation = useMutation({
     mutationFn: ({ storeId, payload }: { storeId: string; payload: typeof profileForm }) =>
@@ -85,6 +105,7 @@ export function useStoreProfile({
     onSuccess: async (result) => {
       if (result.success) {
         toast.success(isActiveStore ? t("profileUpdateRequested") || "Yêu cầu thay đổi thông tin đã được gửi." : t("profileSaved"))
+        setProfileDraft(null)
         await refreshStore()
       } else {
         toast.error(result.message || t("requestFailed"))
@@ -100,6 +121,7 @@ export function useStoreProfile({
     onSuccess: async (result) => {
       if (result.success) {
         toast.success(t("avatarSaved"))
+        setAvatarDraft(null)
         await refreshStore()
       } else {
         toast.error(result.message || t("requestFailed"))
@@ -115,6 +137,7 @@ export function useStoreProfile({
     onSuccess: async (result) => {
       if (result.success) {
         toast.success(t("coverSaved"))
+        setCoverDraft(null)
         await refreshStore()
       } else {
         toast.error(result.message || t("requestFailed"))
@@ -129,12 +152,17 @@ export function useStoreProfile({
     mutationFn: ({ storeId, type, file, altText }: { storeId: string; type: "avatar" | "cover"; file: File; altText: string }) =>
       uploadMyStoreImage(storeId, type, file, altText),
     onSuccess: async (result, variables) => {
-      const res = result as { success?: boolean; url?: string; message?: string }
-      if (res && (res.success || res.url)) {
+      const response = result as { success?: boolean; url?: string; message?: string }
+      if (response.success || response.url) {
         toast.success(variables.type === "avatar" ? t("avatarSaved") : t("coverSaved"))
+        if (variables.type === "avatar") {
+          setAvatarDraft(null)
+        } else {
+          setCoverDraft(null)
+        }
         await refreshStore()
       } else {
-        toast.error(res?.message || t("requestFailed"))
+        toast.error(response.message || t("requestFailed"))
       }
     },
     onError: (error: AxiosError<{ message?: string }>) => {

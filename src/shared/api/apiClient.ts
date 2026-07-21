@@ -1,8 +1,8 @@
-import { getApiClient, getPublicApiClient, getKeycloak, getValidToken as getValidTokenShared, configurePlatformApi } from '@platform-system/api-client';
+import { getApiClient, getPublicApiClient, getKeycloak, getValidToken as getValidTokenShared, configureApiClient } from '@system/api-client';
 import { toast } from 'sonner';
 import { ENV } from '../config/env';
 
-configurePlatformApi({
+configureApiClient({
   baseURL: ENV.API_URL,
   keycloak: {
     url: ENV.KEYCLOAK_URL,
@@ -22,7 +22,9 @@ configurePlatformApi({
       error.config?.url?.includes('/api/identity/users/me/images/avatar') ||
       error.config?.url?.includes('/api/identity/users/me/images/cover') ||
       error.config?.url?.includes('/api/identity/users/me/profile') ||
-      error.config?.url?.includes('/api/catalog/manage/stores/me/products/pending-owner-review')
+      error.config?.url?.includes('/api/catalog/manage/stores/me/products/pending-owner-review') ||
+      error.config?.url?.includes('/api/identity/users/lookup') ||
+      /api\/identity\/users\/[0-9a-fA-F-]{36}/.test(error.config?.url || '')
     )) {
       return;
     }

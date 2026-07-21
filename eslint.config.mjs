@@ -14,15 +14,15 @@ const eslintConfig = defineConfig([
           patterns: [
             {
               group: [
-                "@platform-system/design-ui/components/*",
-                "@platform-system/design-ui/theme-provider",
-                "@platform-system/design-ui/use-theme",
-                "@platform-system/design-ui/branding",
-                "@platform-system/design-ui/lib/cn",
-                "@platform-system/design-ui/ThemeProvider",
-                "@platform-system/design-ui/useTheme",
+                "@system/design-ui/components/*",
+                "@system/design-ui/theme-provider",
+                "@system/design-ui/use-theme",
+                "@system/design-ui/branding",
+                "@system/design-ui/lib/cn",
+                "@system/design-ui/ThemeProvider",
+                "@system/design-ui/useTheme",
               ],
-              message: "Import from the root package \"@platform-system/design-ui\" instead.",
+              message: "Import from the root package \"@system/design-ui\" instead.",
             },
           ],
         },

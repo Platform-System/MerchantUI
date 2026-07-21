@@ -1,5 +1,5 @@
 {
-  "name": "platform-merchant-ui",
+  "name": "merchant-ui",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@iconify/react": "^6.0.2",
-    "@platform-system/api-client": "*",
-    "@platform-system/design-ui": "*",
+    "@system/api-client": "*",
+    "@system/design-ui": "*",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.8",

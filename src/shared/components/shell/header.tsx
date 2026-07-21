@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Link } from "@/i18n/navigation"
 import { usePathname, useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Avatar, AvatarFallback, AvatarImage, Badge, Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, cn, UserProfileCard, HeaderLayout, UserProfileDropdown } from '@platform-system/design-ui';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Avatar, AvatarFallback, AvatarImage, Badge, Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, cn, UserProfileCard, HeaderLayout, UserProfileDropdown } from '@system/design-ui';
 import {
   Search,
   ShoppingBag,

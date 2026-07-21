@@ -69,7 +69,7 @@ export function useStoreMetadata() {
   }, [])
 
   // Load all user stores
-  const { data: myStores = [], isLoading: isLoadingMyStores } = useQuery({
+  const { data: myStores = [], isLoading: isLoadingMyStores, isFetching: isFetchingMyStores } = useQuery({
     queryKey: storeManageQueryKeys.myStores,
     queryFn: fetchMyStores,
     enabled: hasStoreFromToken !== null,
@@ -78,6 +78,9 @@ export function useStoreMetadata() {
 
   // Synchronize selectedStoreId with available stores
   React.useEffect(() => {
+    if (isLoadingMyStores) return
+    if (myStores.length === 0 && isFetchingMyStores) return
+
     if (myStores.length > 0) {
       const exists = myStores.some(s => s.id === selectedStoreId)
       if (!exists) {
@@ -95,12 +98,12 @@ export function useStoreMetadata() {
         return () => clearTimeout(timer)
       }
     }
-  }, [myStores, selectedStoreId])
+  }, [myStores, selectedStoreId, isLoadingMyStores, isFetchingMyStores])
 
   const { data: myStore, isLoading, isFetching } = useQuery({
     queryKey: selectedStoreId ? storeManageQueryKeys.store(selectedStoreId) : ["store-manage", "none"],
     queryFn: () => selectedStoreId ? fetchMyStore(selectedStoreId) : null,
-    enabled: !!selectedStoreId,
+    enabled: !!selectedStoreId && !isLoadingMyStores && myStores.some(s => s.id === selectedStoreId),
     staleTime: 60 * 1000,
   })
 
@@ -118,7 +121,7 @@ export function useStoreMetadata() {
   const { data: activationRequests = [], isLoading: isLoadingActivationRequests } = useQuery({
     queryKey: ["store-manage", selectedStoreId, "activation-requests"],
     queryFn: () => selectedStoreId ? fetchStoreActivationRequests(selectedStoreId) : [],
-    enabled: !!selectedStoreId,
+    enabled: !!selectedStoreId && !isLoadingMyStores && myStores.some(s => s.id === selectedStoreId),
     staleTime: 30 * 1000,
   })
 

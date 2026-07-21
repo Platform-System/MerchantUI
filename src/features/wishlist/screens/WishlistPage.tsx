@@ -6,7 +6,7 @@ import { Heart, Trash2, ShoppingBag, ArrowLeft } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useWishlist } from "../context/WishlistContext"
 import { useCart } from "@/features/cart"
-import { Button, EmptyStatePanel } from '@platform-system/design-ui';
+import { Button, EmptyStatePanel } from '@system/design-ui';
 import { Link } from "@/i18n/navigation"
 import Image from "next/image"
 
