@@ -49,13 +49,13 @@ jobs:
               let modified = false;
               if (pkg.dependencies) {
                 if (pkg.dependencies['@platform-system/design-ui'] === '*') {
-                  const targetBranch = checkBranchExists('https://github.com/Platform-System/Platform.DesignSystemUI.git', branchName) ? branchName : 'main';
-                  pkg.dependencies['@platform-system/design-ui'] = 'git+ssh://git@github.com/Platform-System/Platform.DesignSystemUI.git#' + targetBranch;
+                  const targetBranch = checkBranchExists('https://github.com/Platform-System/DesignSystemUI.git', branchName) ? branchName : 'main';
+                  pkg.dependencies['@platform-system/design-ui'] = 'git+ssh://git@github.com/Platform-System/DesignSystemUI.git#' + targetBranch;
                   modified = true;
                 }
                 if (pkg.dependencies['@platform-system/api-client'] === '*') {
-                  const targetBranch = checkBranchExists('https://github.com/Platform-System/Platform.ApiClient.git', branchName) ? branchName : 'main';
-                  pkg.dependencies['@platform-system/api-client'] = 'git+ssh://git@github.com/Platform-System/Platform.ApiClient.git#' + targetBranch;
+                  const targetBranch = checkBranchExists('https://github.com/Platform-System/ApiClient.git', branchName) ? branchName : 'main';
+                  pkg.dependencies['@platform-system/api-client'] = 'git+ssh://git@github.com/Platform-System/ApiClient.git#' + targetBranch;
                   modified = true;
                 }
               }
@@ -80,7 +80,7 @@ jobs:
 
   build:
     needs: verify
-    uses: Platform-System/Platform.CI-CD/.github/workflows/build-nextjs.yml@main
+    uses: Platform-System/CI-CD/.github/workflows/build-nextjs.yml@main
     with:
       image_name: 'platform-merchant-ui'
       push_image: true

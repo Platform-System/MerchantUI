@@ -14,7 +14,7 @@ permissions:
 jobs:
   call-deploy:
     if: ${{ github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'repository_dispatch') }}
-    uses: Platform-System/Platform.CI-CD/.github/workflows/deploy-docker.yml@main
+    uses: Platform-System/CI-CD/.github/workflows/deploy-docker.yml@main
     with:
       service_name: merchant-ui
     secrets: inherit
