@@ -48,14 +48,14 @@ jobs:
               const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
               let modified = false;
               if (pkg.dependencies) {
-                if (pkg.dependencies['@platform-system/design-ui'] === '*') {
+                if (pkg.dependencies['@system/design-ui'] === '*') {
                   const targetBranch = checkBranchExists('https://github.com/Platform-System/DesignSystemUI.git', branchName) ? branchName : 'main';
-                  pkg.dependencies['@platform-system/design-ui'] = 'git+ssh://git@github.com/Platform-System/DesignSystemUI.git#' + targetBranch;
+                  pkg.dependencies['@system/design-ui'] = 'git+ssh://git@github.com/Platform-System/DesignSystemUI.git#' + targetBranch;
                   modified = true;
                 }
-                if (pkg.dependencies['@platform-system/api-client'] === '*') {
+                if (pkg.dependencies['@system/api-client'] === '*') {
                   const targetBranch = checkBranchExists('https://github.com/Platform-System/ApiClient.git', branchName) ? branchName : 'main';
-                  pkg.dependencies['@platform-system/api-client'] = 'git+ssh://git@github.com/Platform-System/ApiClient.git#' + targetBranch;
+                  pkg.dependencies['@system/api-client'] = 'git+ssh://git@github.com/Platform-System/ApiClient.git#' + targetBranch;
                   modified = true;
                 }
               }
