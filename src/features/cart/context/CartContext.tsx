@@ -69,7 +69,7 @@ export function useCart() {
     queryKey: ["backendCart"],
     queryFn: async (): Promise<BackendCartResponse | null> => {
       try {
-        const response = await apiClient.get<Result<BackendCartResponse>>("/api/ordering/carts")
+        const response = await apiClient.get<Result<BackendCartResponse>>("/api/carts")
         if (response.data && response.data.success && response.data.data) {
           return response.data.data
         }
@@ -138,7 +138,7 @@ export function useCart() {
     // Sync to backend if authenticated
     if (isAuthenticated) {
       try {
-        await apiClient.post("/api/ordering/carts/items", {
+        await apiClient.post("/api/carts/items", {
           productId: item.id,
           quantity: nextQuantity,
         })
@@ -156,7 +156,7 @@ export function useCart() {
     // Sync to backend if authenticated
     if (isAuthenticated) {
       try {
-        await apiClient.delete(`/api/ordering/carts/items/${id}`)
+        await apiClient.delete(`/api/carts/items/${id}`)
         refetchCart()
       } catch (err) {
         console.error("Failed to sync remove cart item from backend:", err)
@@ -172,9 +172,9 @@ export function useCart() {
     if (isAuthenticated) {
       try {
         if (quantity <= 0) {
-          await apiClient.delete(`/api/ordering/carts/items/${id}`)
+          await apiClient.delete(`/api/carts/items/${id}`)
         } else {
-          await apiClient.put(`/api/ordering/carts/items/${id}`, {
+          await apiClient.put(`/api/carts/items/${id}`, {
             productId: id,
             newQuantity: quantity,
           })

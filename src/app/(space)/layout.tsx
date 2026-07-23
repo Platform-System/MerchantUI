@@ -1,3 +1,5 @@
+"use client"
+
 import { Header } from "@/shared/components/shell/header"
 import { CartDrawer } from "@/features/cart"
 import I18nProvider from "@/core/providers/I18nProvider"

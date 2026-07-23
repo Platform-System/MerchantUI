@@ -1,3 +1,5 @@
+"use client"
+
 import { Header } from "@/shared/components/shell/header"
 import { Footer } from "@/shared/components/shell/footer"
 import { CartDrawer } from "@/features/cart"
