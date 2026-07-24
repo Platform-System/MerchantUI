@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import * as React from 'react';
 import Keycloak from 'keycloak-js';
 import { Spinner } from '@system/design-ui';
 import { keycloak } from '@/shared/api/keycloak';
@@ -15,7 +15,7 @@ interface AuthContextType {
   token: string | undefined;
 }
 
-const AuthContext = createContext<AuthContextType>({
+const AuthContext = React.createContext<AuthContextType>({
   isAuthenticated: false,
   isInitialized: false,
   keycloak: null,
@@ -25,15 +25,15 @@ const AuthContext = createContext<AuthContextType>({
   token: undefined,
 });
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => React.useContext(AuthContext);
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isInitialized, setIsInitialized] = React.useState(false);
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   
-  const initRef = useRef(false);
+  const initRef = React.useRef(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (initRef.current || !keycloak) return;
     initRef.current = true;
 
@@ -84,18 +84,6 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     }
   };
 
-  if (typeof window === 'undefined') {
-    return <>{children}</>;
-  }
-
-  if (!isInitialized) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Spinner className="spinner-accent h-12 w-12" />
-      </div>
-    );
-  }
-
   return (
     <AuthContext.Provider
       value={{
@@ -108,7 +96,13 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         token: keycloak?.token,
       }}
     >
-      {children}
+      {!isInitialized && typeof window !== 'undefined' ? (
+        <div className="flex min-h-screen items-center justify-center bg-background">
+          <Spinner className="spinner-accent h-12 w-12" />
+        </div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 }
