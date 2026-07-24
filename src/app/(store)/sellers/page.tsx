@@ -1,9 +1,12 @@
 "use client"
 
-import React from "react"
+import React, { Suspense } from "react"
 import { SellersScreen } from "@/features/seller"
 
 export default function SellersListingPage() {
-  return <SellersScreen />
+  return (
+    <Suspense fallback={null}>
+      <SellersScreen />
+    </Suspense>
+  )
 }
-

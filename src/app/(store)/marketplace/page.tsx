@@ -1,9 +1,12 @@
 "use client"
 
-import React from "react"
+import React, { Suspense } from "react"
 import { MarketplaceScreen } from "@/features/marketplace"
 
 export default function MarketplacePage() {
-  return <MarketplaceScreen />
+  return (
+    <Suspense fallback={null}>
+      <MarketplaceScreen />
+    </Suspense>
+  )
 }
-
