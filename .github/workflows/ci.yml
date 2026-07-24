@@ -24,6 +24,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GHCR_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -32,10 +34,10 @@ jobs:
 
       - name: Configure Git Credentials
         run: |
-          git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "https://github.com/"
-          git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "git+https://github.com/"
           git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "ssh://git@github.com/"
           git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "git@github.com:"
+          git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "git+ssh://git@github.com/"
+          git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "git+https://github.com/"
         env:
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
 
