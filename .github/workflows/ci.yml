@@ -30,6 +30,15 @@ jobs:
         with:
           node-version: '24'
 
+      - name: Configure Git Credentials
+        run: |
+          git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "https://github.com/"
+          git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "git+https://github.com/"
+          git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "ssh://git@github.com/"
+          git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "git@github.com:"
+        env:
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+
       - name: Resolve Workspace Dependencies for CI Build
         run: |
           node -e "
@@ -90,4 +99,3 @@ jobs:
         NEXT_PUBLIC_KEYCLOAK_REALM=${{ vars.KEYCLOAK_REALM }}
         NEXT_PUBLIC_KEYCLOAK_CLIENT_ID=${{ vars.MERCHANT_CLIENT_ID }}
     secrets: inherit
-
