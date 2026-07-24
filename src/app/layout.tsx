@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
-import { BRAND_METADATA } from '@system/design-ui';
 import { ClientProviders } from "@/core/providers/ClientProviders";
 import { GlobalLoadingBar } from "@/shared/layout/GlobalLoadingBar";
 import "./globals.css";
@@ -13,8 +12,8 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: BRAND_METADATA.title,
-  description: BRAND_METADATA.description,
+  title: "Nyxoris | Quản Lý Gian Hàng & Kênh Bán Hàng",
+  description: "Nền tảng thương mại điện trị thế hệ mới - Quản lý gian hàng và trải nghiệm bán hàng cao cấp.",
 };
 
 export default async function RootLayout({
