@@ -85,8 +85,8 @@ function buildSellerDefaults(name: string, slug?: string | null) {
 
   return {
     slug: resolvedSlug,
-    avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name || "seller")}`,
-    coverImage: DEFAULT_STORE_COVER,
+    avatar: "",
+    coverImage: "",
   }
 }
 

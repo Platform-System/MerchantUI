@@ -145,6 +145,7 @@ export interface StoreInvitationResponse {
   role: string
   status: string
   invitedAt: string
+  ownerId?: string | null
 }
 
 export async function fetchMyStoreInvitations(page = 1, pageSize = 100): Promise<PagedResult<StoreInvitationResponse>> {
@@ -345,5 +346,3 @@ export async function cancelStoreInvitation(storeId: string, userId: string): Pr
   const response = await apiClient.delete<Result<unknown>>(`/api/store/manage/stores/${storeId}/members/invitations/${userId}`)
   return response.data
 }
-
-

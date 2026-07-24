@@ -3,7 +3,7 @@
 import Image from "next/image"
 import { Link } from "@/i18n/navigation"
 import { motion } from "framer-motion"
-import { Star, MapPin, Package } from "lucide-react"
+import { Star, MapPin, Package, Store } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage, Badge, Button } from '@system/design-ui';
 import { Seller } from "@/types/store"
 
@@ -25,20 +25,30 @@ export function SellerCard({ seller }: SellerCardProps) {
 
       {/* Cover Image */}
       <div className="relative h-24 overflow-hidden">
-        <Image
-          src={seller.coverImage}
-          alt={`Anh bia ${seller.name}`}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        {seller.coverImage ? (
+          <>
+            <Image
+              src={seller.coverImage}
+              alt={`Anh bia ${seller.name}`}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-zinc-100 bg-[linear-gradient(to_right,rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:14px_24px]" />
+        )}
       </div>
 
       {/* Avatar */}
       <div className="relative -mt-8 flex justify-center">
         <Avatar className="store-surface-soft size-16 shadow-[0_10px_24px_rgb(0_0_0/0.1)]">
-          <AvatarImage src={seller.avatar} alt={seller.name} className="object-cover" />
-          <AvatarFallback>{seller.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+          {seller.avatar ? (
+            <AvatarImage src={seller.avatar} alt={seller.name} className="object-cover" />
+          ) : null}
+          <AvatarFallback className="bg-zinc-100 text-muted-foreground">
+            <Store className="h-7 w-7 opacity-40" />
+          </AvatarFallback>
         </Avatar>
       </div>
 

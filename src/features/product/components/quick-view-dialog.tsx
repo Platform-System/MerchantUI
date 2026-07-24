@@ -39,7 +39,7 @@ export function QuickViewDialog({ product, isOpen, onOpenChange }: QuickViewDial
   const resolvedProduct = liveProduct ?? product
 
   const sellerAvatar = allSellers.find(s => s.name === resolvedProduct.seller?.name)?.avatar
-    || `https://api.dicebear.com/7.x/adventurer/svg?seed=${resolvedProduct.seller?.name}`
+    || resolvedProduct.seller?.avatar || ""
 
   const fullProduct = {
     ...resolvedProduct,

@@ -19,6 +19,7 @@ import {
   Truck,
   RotateCcw,
   ShieldCheck,
+  Store,
 } from "lucide-react"
 import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, EmptyStatePanel, FilterBar, RatingStars, Spinner, Tabs, TabsContent, TabsList, TabsTrigger, cn } from '@system/design-ui';
 import { ProductCard } from "@/features/product"
@@ -124,14 +125,20 @@ export function SellerStorefrontScreen() {
           >
             {/* Cover Image Container inside the card */}
             <div className="relative h-64 overflow-hidden w-full sm:h-80 lg:h-96">
-              <Image
-                src={seller.coverImage}
-                alt={`${seller.name} cover`}
-                fill
-                className="object-cover"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              {seller.coverImage ? (
+                <Image
+                  src={seller.coverImage}
+                  alt={`${seller.name} cover`}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              ) : (
+                <div className="absolute inset-0 bg-zinc-100 bg-[linear-gradient(to_right,rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:14px_24px]" />
+              )}
+              {seller.coverImage && (
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              )}
             </div>
 
             {/* Profile Info Container */}
@@ -139,69 +146,78 @@ export function SellerStorefrontScreen() {
               <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-4">
                 <div className="relative">
                   <div className="store-surface-soft relative -mt-[56px] h-28 w-28 overflow-hidden rounded-full border-4 border-[rgb(var(--store-surface-rgb))] shadow-[0_18px_36px_rgb(0_0_0/0.15)] sm:-mt-[72px] sm:h-36 sm:w-36 z-20">
-                    <Image src={seller.avatar} alt={seller.name} fill className="object-cover" />
+                    {seller.avatar ? (
+                      <Image src={seller.avatar} alt={seller.name} fill className="object-cover" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center bg-zinc-100 text-zinc-500">
+                        <Store className="h-12 w-12 text-zinc-400 sm:h-16 sm:w-16" />
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                <div className="flex-1 min-w-0 flex flex-col xl:grid xl:grid-cols-[1fr_auto] xl:items-start gap-x-8 gap-y-4 pt-8 sm:pt-10">
-                  <div className="flex flex-col gap-4 xl:col-start-1 xl:row-start-1">
+                <div className="flex-1 min-w-0 flex flex-col gap-5 pt-8 sm:pt-10">
+                  {/* Top Row: Store Name/Tagline & Action Buttons/Stats */}
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div className="flex flex-col gap-1">
-                      <div className="flex flex-wrap items-center gap-3">
-                        <h1 className="text-2xl font-semibold tracking-[-0.02em] sm:text-3xl">
-                          {seller.name}
-                        </h1>
+                      <h1 className="text-2xl font-semibold tracking-[-0.02em] sm:text-3xl">
+                        {seller.name}
+                      </h1>
+                      <p className="store-muted-text text-sm sm:text-base">{seller.tagline}</p>
+                    </div>
+
+                    <div className="flex flex-col gap-3 lg:items-end">
+                      <div className="flex flex-wrap gap-3">
+                        <Button
+                          onClick={() => setIsFollowing((current) => !current)}
+                          variant={isFollowing ? "outline" : "brand"}
+                          className={cn(
+                            "rounded-xl px-5 shadow-none",
+                            isFollowing
+                              ? "border-[rgb(var(--store-border-rgb)/0.75)] bg-[rgb(var(--store-surface-rgb)/0.7)] text-foreground hover:bg-[rgb(var(--store-accent-rgb)/0.12)]"
+                              : ""
+                          )}
+                        >
+                          {isFollowing ? t("following") : t("follow")}
+                        </Button>
+                        <Button variant="outline" className="rounded-xl px-5">
+                          <MessageCircle className="mr-2 h-4 w-4" />
+                          {t("contact")}
+                        </Button>
+                        <Button variant="outline" size="icon" className="rounded-xl">
+                          <Share2 className="h-4 w-4" />
+                        </Button>
                       </div>
 
-                      <p className="store-muted-text">{seller.tagline}</p>
+                      <div className="store-muted-text flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm bg-[rgb(var(--store-border-rgb)/0.3)] rounded-full px-4 py-1.5 w-fit border border-[rgb(var(--store-border-rgb)/0.5)]">
+                        <div className="flex items-center gap-1.5">
+                          <Star
+                            className="h-4 w-4"
+                            style={{ fill: "var(--color-star)", color: "var(--color-star)" }}
+                          />
+                          <span className="font-medium text-foreground">{seller.rating}</span>
+                          <span>({seller.reviewCount} {t("reviews")})</span>
+                        </div>
+                        <div className="h-3 w-px bg-[rgb(var(--store-border-rgb)/0.7)] hidden sm:block" />
+                        <div className="flex items-center gap-1.5">
+                          <Package className="h-4 w-4" />
+                          <span>{seller.productCount} {t("products")}</span>
+                        </div>
+                        <div className="h-3 w-px bg-[rgb(var(--store-border-rgb)/0.7)] hidden sm:block" />
+                        <div className="flex items-center gap-1.5">
+                          <MapPin className="h-4 w-4" />
+                          <span>{seller.location}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <p className="store-muted-text max-w-4xl leading-relaxed xl:col-start-1 xl:row-start-2">{seller.description}</p>
-
-                  <div className="flex flex-col gap-4 xl:col-start-2 xl:row-start-1 xl:row-span-2 xl:self-start xl:items-end mt-4 xl:mt-0">
-                    <div className="flex flex-wrap gap-3">
-                      <Button
-                        onClick={() => setIsFollowing((current) => !current)}
-                        variant={isFollowing ? "outline" : "brand"}
-                        className={cn(
-                          "rounded-xl px-5 shadow-none",
-                          isFollowing
-                            ? "border-[rgb(var(--store-border-rgb)/0.75)] bg-[rgb(var(--store-surface-rgb)/0.7)] text-foreground hover:bg-[rgb(var(--store-accent-rgb)/0.12)]"
-                            : ""
-                        )}
-                      >
-                        {isFollowing ? t("following") : t("follow")}
-                      </Button>
-                      <Button variant="outline" className="rounded-xl px-5">
-                        <MessageCircle className="mr-2 h-4 w-4" />
-                        {t("contact")}
-                      </Button>
-                      <Button variant="outline" size="icon" className="rounded-xl">
-                        <Share2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-
-                    <div className="store-muted-text flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm bg-[rgb(var(--store-border-rgb)/0.3)] rounded-full px-4 py-1.5 w-fit border border-[rgb(var(--store-border-rgb)/0.5)]">
-                      <div className="flex items-center gap-1.5">
-                        <Star
-                          className="h-4 w-4"
-                          style={{ fill: "var(--color-star)", color: "var(--color-star)" }}
-                        />
-                        <span className="font-medium text-foreground">{seller.rating}</span>
-                        <span>({seller.reviewCount} {t("reviews")})</span>
-                      </div>
-                      <div className="h-3 w-px bg-[rgb(var(--store-border-rgb)/0.7)] hidden sm:block" />
-                      <div className="flex items-center gap-1.5">
-                        <Package className="h-4 w-4" />
-                        <span>{seller.productCount} {t("products")}</span>
-                      </div>
-                      <div className="h-3 w-px bg-[rgb(var(--store-border-rgb)/0.7)] hidden sm:block" />
-                      <div className="flex items-center gap-1.5">
-                        <MapPin className="h-4 w-4" />
-                        <span>{seller.location}</span>
-                      </div>
-                    </div>
-                  </div>
+                  {/* Bottom Row: Full Width Description */}
+                  {seller.description && (
+                    <p className="store-muted-text w-full leading-relaxed text-sm sm:text-base border-t border-[rgb(var(--store-border-rgb)/0.3)] pt-4 mt-1">
+                      {seller.description}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
