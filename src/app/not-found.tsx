@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Button } from '@system/design-ui';
 
 export default function NotFound() {
   return (
@@ -11,9 +10,9 @@ export default function NotFound() {
       <p className="mt-2 text-sm text-muted-foreground">
         Trang bạn đang truy cập không tồn tại hoặc đã được chuyển sang đường dẫn khác.
       </p>
-      <Button asChild className="mt-6 rounded-full px-6">
-        <Link href="/">Quay về trang chủ</Link>
-      </Button>
+      <Link href="/" className="mt-6 rounded-full px-6 py-2.5 bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity">
+        Quay về trang chủ
+      </Link>
     </div>
   );
 }
