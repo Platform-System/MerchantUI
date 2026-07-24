@@ -38,6 +38,7 @@ jobs:
           git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "git@github.com:"
           git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "git+ssh://git@github.com/"
           git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "git+https://github.com/"
+          git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "https://github.com/"
         env:
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
 
@@ -61,12 +62,12 @@ jobs:
               if (pkg.dependencies) {
                 if (pkg.dependencies['@system/design-ui'] === '*') {
                   const targetBranch = checkBranchExists('https://github.com/Platform-System/Platform.DesignSystemUI.git', branchName) ? branchName : 'main';
-                  pkg.dependencies['@system/design-ui'] = 'git+https://github.com/Platform-System/Platform.DesignSystemUI.git#' + targetBranch;
+                  pkg.dependencies['@system/design-ui'] = 'git+https://' + ghToken + '@github.com/Platform-System/Platform.DesignSystemUI.git#' + targetBranch;
                   modified = true;
                 }
                 if (pkg.dependencies['@system/api-client'] === '*') {
                   const targetBranch = checkBranchExists('https://github.com/Platform-System/Platform.ApiClient.git', branchName) ? branchName : 'main';
-                  pkg.dependencies['@system/api-client'] = 'git+https://github.com/Platform-System/Platform.ApiClient.git#' + targetBranch;
+                  pkg.dependencies['@system/api-client'] = 'git+https://' + ghToken + '@github.com/Platform-System/Platform.ApiClient.git#' + targetBranch;
                   modified = true;
                 }
               }
