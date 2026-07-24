@@ -39,7 +39,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
     keycloak.init({
       onLoad: 'login-required',
-      silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
+      silentCheckSsoRedirectUri: typeof window !== 'undefined' ? window.location.origin + '/silent-check-sso.html' : undefined,
       pkceMethod: 'S256',
       checkLoginIframe: false,
       enableLogging: false,
@@ -64,7 +64,6 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     };
   }, []);
 
-
   const login = () => {
     if (keycloak) {
       keycloak.login().catch(console.error);
@@ -75,7 +74,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
   const logout = () => {
     if (keycloak) {
-      keycloak.logout({ redirectUri: window.location.origin });
+      keycloak.logout({ redirectUri: typeof window !== 'undefined' ? window.location.origin : undefined });
     }
   };
 
@@ -84,6 +83,10 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       keycloak.register().catch(console.error);
     }
   };
+
+  if (typeof window === 'undefined') {
+    return <>{children}</>;
+  }
 
   if (!isInitialized) {
     return (
@@ -109,4 +112,3 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     </AuthContext.Provider>
   );
 }
-
