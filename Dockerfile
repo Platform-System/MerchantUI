@@ -2,26 +2,28 @@ FROM node:20-alpine AS base
 
 # 1. Install dependencies only when needed
 FROM base AS deps
-RUN apk add --no-cache libc6-compat git
+RUN apk add --no-cache libc6-compat git openssh-client
 WORKDIR /app
 
 ARG GHCR_TOKEN
 ENV GHCR_TOKEN=$GHCR_TOKEN
 
 COPY package.json ./
-RUN node -e " \
-  const fs = require('fs'); \
-  const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8')); \
+RUN node -e ' \
+  const fs = require("fs"); \
+  const token = process.env.GHCR_TOKEN; \
+  const pkg = JSON.parse(fs.readFileSync("package.json", "utf8")); \
   if (pkg.dependencies) { \
-    if (pkg.dependencies['@system/design-ui'] === '*') pkg.dependencies['@system/design-ui'] = 'git+https://${GHCR_TOKEN}@github.com/Platform-System/Platform.DesignSystemUI.git#main'; \
-    if (pkg.dependencies['@system/api-client'] === '*') pkg.dependencies['@system/api-client'] = 'git+https://${GHCR_TOKEN}@github.com/Platform-System/Platform.ApiClient.git#main'; \
+    if (pkg.dependencies["@system/design-ui"] === "*") pkg.dependencies["@system/design-ui"] = "git+https://" + token + "@github.com/Platform-System/Platform.DesignSystemUI.git#main"; \
+    if (pkg.dependencies["@system/api-client"] === "*") pkg.dependencies["@system/api-client"] = "git+https://" + token + "@github.com/Platform-System/Platform.ApiClient.git#main"; \
   } \
-  fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2)); \
-"
-RUN git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "https://github.com/" && \
+  fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2)); \
+'
+RUN git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "ssh://git@github.com/" && \
+    git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "git@github.com:" && \
+    git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "git+ssh://git@github.com/" && \
     git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "git+https://github.com/" && \
-    git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "ssh://git@github.com/" && \
-    git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "git@github.com:"
+    git config --global url."https://${GHCR_TOKEN}@github.com/".insteadOf "https://github.com/"
 RUN --mount=type=cache,target=/root/.npm npm install --legacy-peer-deps
 
 # 2. Rebuild the source code only when needed
